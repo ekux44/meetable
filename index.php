@@ -21,12 +21,29 @@ case 'api':
 	$version = urlParam( 2 );
 	print_pre('api call - version ' . $version);
 break;
+// new meeting
+case 'new':
+	$data = array(
+		'name' => val( $_POST, 'name' ),
+		'length' => val( $_POST, 'length' ),
+		'timeRange' => array( 'start' => val( $_POST, 'start' ), 'end' => val( $_POST, 'end' ) ),
+		'attendeeNames' => val( $_POST, 'attendeeNames' ),
+		'attendeeEmails' => val( $_POST, 'attendeeEmails' ),
+		'attendeePhones' => val( $_POST, 'attendeePhones' ),
+		'creatorName' => val( $_POST, 'creatorName' ),
+		'creatorEmail' => val( $_POST, 'creatorEmail' ),
+		'creatorPhone' => val( $_POST, 'creatorPhone' ),
+		'narrowToOne' => val( $_POST, 'narrowToOne' )
+	);
+	
+	include 'home.php';
+break;
 // display the home page
 default:
 	$data = array(
 		'name' => '',
 		'length' => '',
-		'timeRange' => array(),
+		'timeRange' => array( 'start' => time(), 'end' => strtotime( '+1 week' ) ),
 		'attendeeNames' => array( 'jared' ),
 		'attendeeEmails' => array('jared@nfuseweb.com'),
 		'attendeePhones' => array('9186051721'),

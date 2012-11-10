@@ -22,7 +22,7 @@ $(function() {
 	
 	$('#attendees').delegate('.input-phone','keydown',function(e) {
 		// create a new line when tab is pressed in the last input box
-		if( !e.shiftKey && e.keyCode == 9 && $(this).parents('.line').next('.line').length == 0 )
+		if( !e.shiftKey && e.keyCode == 9 && $(this).parents('.line').next('.line').attr('id') == 'new-line' )
 		{
 			e.preventDefault();
 			newLine();
@@ -47,6 +47,6 @@ $(function() {
 	{
 		$('#new-line').before( $('#attendeeLineTemplate').html() );
 		
-		$('input:first', $('#attendees .line:last')).focus();
+		$('input:first', $('#attendees .not-new:last')).focus();
 	}	
 });

@@ -5,7 +5,7 @@
 /* Attendees */
 
 #attendees {
-	max-width: 790px;
+	max-width: 650px;
 	margin: 0 0 20px;
 	background: rgba( 240,240,240, 1);
 	border-radius: 4px;
@@ -13,12 +13,37 @@
 	overflow: hidden;
 }
 
+.line {
+	width: 100%;
+	height: 35px;
+	clear: both;
+	float: left;
+	padding: 12px 0;
+}
+
+.line > div {
+	text-align: center;
+	float: left;
+}
+
+.line .icon {
+	margin: 7px 5px 0 19px;
+}
+
+.line-name { width: 200px; }
+.input-name { width: 130px; }
+
+.line-email { width: 225px; }
+.input-email { width: 156px; }
+
+.line-or { width: 25px; }
+
+.line-phone { width: 170px; }
+.input-phone { width: 100px; }
+
 #new-line {
 	background: rgba(69, 69, 69, .25);
-	margin-bottom: -3px;
-	padding: 12px 0;
 	cursor: pointer;
-	text-align: center;
 }
 
 #new-line input { cursor: pointer; background: rgba (204, 204, 204, .05); }
@@ -26,16 +51,8 @@
 #new-line:hover { background: rgba(204, 204, 204, .2); }
 #new-line:hover input { background: #f5f5f5; }
 
-.line:first-child { margin-top: 15px; }
 
-.line > div {
-	margin: 0 0 15px;
-	text-align: center;
-}
 
-.row-fluid .icon {
-	margin: 7px 5px 0 19px;
-}
-
-.input-name { width: 130px; }
-.input-email,.input-phone { width: 156px; }
+.left { text-align: left !important; }
+.right { text-align: right !important; }
+.center { text-alight: center !important; }
