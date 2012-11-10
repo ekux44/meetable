@@ -26,13 +26,13 @@
 
 // Set the database access information as constants.
 DEFINE ('DB_TYPE', 'mysql'); // Database Type
-DEFINE ('DB_USER', ''); // Database Username.
-DEFINE ('DB_PASSWORD', ''); // Database Password.
-DEFINE ('DB_HOST', ''); // Database Host.
-DEFINE ('DB_NAME', ''); // Database Name.
+DEFINE ('DB_USER', 'hackathon'); // Database Username.
+DEFINE ('DB_PASSWORD', 'GnQSc14bRffF936'); // Database Password.
+DEFINE ('DB_HOST', 'localhost'); // Database Host.
+DEFINE ('DB_NAME', 'Hackathon'); // Database Name.
 DEFINE ('ERROR_LEVEL', '0'); // Set at 0 for development and 1 for production.
 // Memcache
-DEFINE ('USE_MEMCACHE', true );
+DEFINE ('USE_MEMCACHE', false );
 DEFINE ('MEMCACHE_HOST', '127.0.0.1' );
 DEFINE ('MEMCACHE_PORT', '11211' );
  
