@@ -5,10 +5,14 @@
 	
 	<link href="/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
 	<link href="/css/bootstrap-responsive.min.css" type="text/css" rel="stylesheet" />
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" />
 	<link href="/css/style.css" type="text/css" rel="stylesheet" />
-	
+    	
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/js/globalize.js"></script>
+	<script type="text/javascript" src="/js/jquery.mousewheel.js"></script>
 	<script type="text/javascript" src="/js/header.js"></script>
 </head>
 <body>
@@ -29,9 +33,11 @@
 		<p>
 			<label>What is the time frame you want to schedule this meeting in?</label>
 			<label>Start</label>
-			<input type="text" name="start" value="<?php echo $data['timeRange']['start'];?>" />
+			<input type="text" name="start-date" value="<?php echo $data['timeRange']['start-date'];?>" class="date-picker" />
+			<input type="text" name="start-time" value="<?php echo $data['timeRange']['start-time'];?>" class="time-picker" />
 			<label>End</label>
-			<input type="text" name="end" value="<?php echo $data['timeRange']['end'];?>" />
+			<input type="text" name="end-date" value="<?php echo $data['timeRange']['end-date'];?>" class="date-picker" />
+			<input type="text" name="end-time" value="<?php echo $data['timeRange']['end-time'];?>" class="time-picker" />
 		</p>
 		<p>
 			<label>Who is invited?</label>

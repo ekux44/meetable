@@ -2,6 +2,21 @@
 .or { display: inline-block; margin-left: 10px; margin-right: 10px; }
 #attendeeLineTemplate { display: none; }
 
+/* Date selection */
+.date-picker {
+	width: 80px;
+}
+
+input.time-picker {
+	border: none;
+	margin: 0;
+	box-shadow: none;
+	font-size: 10pt;
+	width: 80px;
+}
+
+.ui-widget-content { border: 1px solid #ccc; margin-top: -10px; }
+
 /* Attendees */
 
 #attendees {
@@ -50,6 +65,7 @@
 #new-line input:focus { box-shadow: none !important; border-color: #ddd !important; }
 #new-line:hover { background: rgba(204, 204, 204, .2); }
 #new-line:hover input { background: #f5f5f5; }
+
 
 
 
