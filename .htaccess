@@ -1,6 +1,3 @@
-# disable apc
-php_flag apc.cache_by_default Off
-
 Options +FollowSymlinks
 RewriteEngine On
 RewriteBase /

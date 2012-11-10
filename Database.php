@@ -399,7 +399,7 @@ class Database
 		}
 		catch(PDOException $e)
 		{
-			ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__ );
+			ErrorStack::add( $e->getMessage(), __CLASS__, __FUNCTION__, null, $tableName );
 			return false;
 		}
 		
@@ -727,7 +727,7 @@ class ErrorStack
 		self::$stack[] = array(
 			'class' => $class,
 			'function' => $function,
-			'message' => Messages::generateMessage( $message, $variables ),
+			'message' => $message,
 			'code' => $code,
 			'context' => ($context) ? $context : self::$context
 		);
@@ -762,6 +762,6 @@ class ErrorStack
 	 */
 	public static function dump()
 	{
-		print_r(ErrorStack::stack());
+		print_pre(ErrorStack::stack());
 	}
 }

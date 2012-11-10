@@ -31,6 +31,8 @@ case 'new':
 	$data = array(
 		'name' => val( $_POST, 'name' ),
 		'length' => val( $_POST, 'length' ),
+		'start' => val( $_POST, 'start-date' ) . ' ' . val( $_POST, 'start-time' ),
+		'end' => val( $_POST, 'end-date' ) . ' ' . val( $_POST, 'end-time' ),
 		'timeRange' => array(
 			'start-date' => val( $_POST, 'start-date' ),
 			'start-time' => val( $_POST, 'start-time' ),
