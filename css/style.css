@@ -1,2 +1,41 @@
 .inline { display: inline; }
 .or { display: inline-block; margin-left: 10px; margin-right: 10px; }
+#attendeeLineTemplate { display: none; }
+
+/* Attendees */
+
+#attendees {
+	max-width: 790px;
+	margin: 0 0 20px;
+	background: rgba( 240,240,240, 1);
+	border-radius: 4px;
+	border: 1px solid rgba(200, 200, 200, 1);
+	overflow: hidden;
+}
+
+#new-line {
+	background: rgba(69, 69, 69, .25);
+	margin-bottom: -3px;
+	padding: 12px 0;
+	cursor: pointer;
+	text-align: center;
+}
+
+#new-line input { cursor: pointer; background: rgba (204, 204, 204, .05); }
+#new-line input:focus { box-shadow: none !important; border-color: #ddd !important; }
+#new-line:hover { background: rgba(204, 204, 204, .2); }
+#new-line:hover input { background: #f5f5f5; }
+
+.line:first-child { margin-top: 15px; }
+
+.line > div {
+	margin: 0 0 15px;
+	text-align: center;
+}
+
+.row-fluid .icon {
+	margin: 7px 5px 0 19px;
+}
+
+.input-name { width: 130px; }
+.input-email,.input-phone { width: 156px; }

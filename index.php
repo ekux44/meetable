@@ -23,6 +23,19 @@ case 'api':
 break;
 // display the home page
 default:
+	$data = array(
+		'name' => '',
+		'length' => '',
+		'timeRange' => array(),
+		'attendeeNames' => array( 'jared' ),
+		'attendeeEmails' => array('jared@nfuseweb.com'),
+		'attendeePhones' => array('9186051721'),
+		'creatorName' => '',
+		'creatorEmail' => '',
+		'creatorPhone' => '',
+		'narrowToOne' => 0
+	);
+
 	include 'home.php';
 break;
 }
