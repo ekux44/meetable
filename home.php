@@ -43,6 +43,9 @@
 				<input class="span2" type="text" name="creatorSMS" />
 			</div>
 		</p>
+		<p>
+			<input type="checkbox" />
+		</p>
 		<input type="submit" name="Submit" value="Create!" class="btn btn-success btn-large" />
 	</form>
 </div>
