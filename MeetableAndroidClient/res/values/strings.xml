@@ -13,4 +13,5 @@
     <string name="invisible">Invisible</string>
     <string name="start_time">Earliest possible start:</string>
     <string name="stop_time">Latest possible end :</string>
+    <string name="add_person">Add Person</string>
 </resources>
