@@ -5,12 +5,12 @@
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="new_meeting">Hold a meeting</string>
-    <string name="data_prompt">set date...</string>
     <string name="event_name_prompt">Meeting Name</string>
     <string name="add_people_prompt">Invite People</string>
     <string name="prefered_contact_prompt">Prefered Contact Method</string>
     <string name="texting_option">Text Message</string>
     <string name="email_option">Email</string>
-    <string name="edit">Change</string>
-
+    <string name="invisible">Invisible</string>
+    <string name="start_time">Earliest possible start:</string>
+    <string name="stop_time">Latest possible end :</string>
 </resources>

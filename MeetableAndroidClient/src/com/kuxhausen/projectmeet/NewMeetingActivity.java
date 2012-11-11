@@ -15,127 +15,150 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-public class NewMeetingActivity extends Activity implements OnClickListener{
-	
-	Button addPeople, setDay, setDuration;
+public class NewMeetingActivity extends Activity implements OnClickListener {
+
+	Button addPeople, setDuration, setTimeStart, setTimeEnd, setDayStart, setDayEnd;
 	RadioGroup contactMethod;
-	TextView dayDisplay, durationDisplay;
 
-    // date and time
-    private int mYear;
-    private int mMonth;
-    private int mDay;
-    private int mHour;
-    private int mMinute;
-
-    static final int TIME_DIALOG_ID = 0;
-    static final int DATE_DIALOG_ID = 1;
+	int duration = 60;
 	
+	// date and time
+	private int mYear;
+	private int mMonth;
+	private int mStartDay;
+	private int mStopDay;
+	private int mStartHour;
+	private int mStopHour;
+	private int mStartMinute;
+	private int mStopMinute;
+
+	static final int DURATION_DIALOG_ID = 0;
+	static final int START_TIME_DIALOG_ID = 1;
+	static final int STOP_TIME_DIALOG_ID = 2;
+	static final int START_DATE_DIALOG_ID = 3;
+	static final int STOP_DATE_DIALOG_ID = 4;
+
 	@Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_newmeeting);
-        
-        
-        
-        dayDisplay = (TextView) findViewById(R.id.dayTextView);
-        durationDisplay = (TextView) findViewById(R.id.durationTextView);
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_newmeeting);
 
-        setDay = (Button) findViewById(R.id.dayButton);
-        setDay.setOnClickListener(this);
-        
-        setDuration = (Button) findViewById(R.id.durationButton);
-        setDuration.setOnClickListener(this);
-        
-        addPeople = (Button) findViewById(R.id.addPeopleButton);
-        addPeople.setOnClickListener(this);
-        
+		setDuration = (Button) findViewById(R.id.durationButton);
+		setDuration.setOnClickListener(this);
+		
+		setTimeStart = (Button) findViewById(R.id.startTimeButton);
+		setTimeStart.setOnClickListener(this);
+		
+		setTimeEnd = (Button) findViewById(R.id.stopTimeButton);
+		setTimeEnd.setOnClickListener(this);
+		
+		setDayStart = (Button) findViewById(R.id.startDayButton);
+		setDayStart.setOnClickListener(this);
+		
+		setDayEnd = (Button) findViewById(R.id.stopDayButton);
+		setDayEnd.setOnClickListener(this);
+		
+		addPeople = (Button) findViewById(R.id.addPeopleButton);
+		addPeople.setOnClickListener(this);
 
-        final Calendar c = Calendar.getInstance();
-        mYear = c.get(Calendar.YEAR);
-        mMonth = c.get(Calendar.MONTH);
-        mDay = c.get(Calendar.DAY_OF_MONTH);
-        mHour = c.get(Calendar.HOUR_OF_DAY);
-        mMinute = c.get(Calendar.MINUTE);
+		final Calendar c = Calendar.getInstance();
+		mYear = c.get(Calendar.YEAR);
+		mMonth = c.get(Calendar.MONTH);
+		mStartDay = c.get(Calendar.DAY_OF_MONTH);
+		mStartHour = c.get(Calendar.HOUR_OF_DAY);
+		mStartMinute = c.get(Calendar.MINUTE);
+		
+		mStopHour = mStartHour + duration/60;
+		mStopMinute= mStartMinute + duration%60;
+		mStopDay = mStartDay;
 
-        updateDisplay();
-    }
-	
-	
-	
-	
+		updateDisplay();
+	}
+
 	@Override
-    protected Dialog onCreateDialog(int id) {
-        switch (id) {
-            case TIME_DIALOG_ID:
-                return new TimePickerDialog(this,
-                        mTimeSetListener, mHour, mMinute, false);
-            case DATE_DIALOG_ID:
-                return new DatePickerDialog(this,
-                            mDateSetListener,
-                            mYear, mMonth, mDay);
-        }
-        return null;
-    }
+	protected Dialog onCreateDialog(int id) {
+		switch (id) {
+		case DURATION_DIALOG_ID:
+			return new TimePickerDialog(this, mDurationSetListener, duration/60, duration%60,
+					true);
+		case START_TIME_DIALOG_ID:
+			return new TimePickerDialog(this, mDurationSetListener, mStartHour, mStartMinute,
+					false);
+		case STOP_TIME_DIALOG_ID:
+			return new TimePickerDialog(this, mDurationSetListener, mStopHour, mStopMinute,
+					false);
+		case START_DATE_DIALOG_ID:
+			return new DatePickerDialog(this, mDateSetListener, mYear, mMonth,
+					mStartDay);
+		case STOP_DATE_DIALOG_ID:
+			return new DatePickerDialog(this, mDateSetListener, mYear, mMonth,
+				mStopDay);
+		}
+		return null;
+	}
 
-    @Override
-    protected void onPrepareDialog(int id, Dialog dialog) {
-        switch (id) {
-            case TIME_DIALOG_ID:
-                ((TimePickerDialog) dialog).updateTime(mHour, mMinute);
-                break;
-            case DATE_DIALOG_ID:
-                ((DatePickerDialog) dialog).updateDate(mYear, mMonth, mDay);
-                break;
-        }
-    }    
+	@Override
+	protected void onPrepareDialog(int id, Dialog dialog, Bundle args) {
+		switch (id) {
+		case DURATION_DIALOG_ID:
+			((TimePickerDialog) dialog).updateTime(duration/60, duration%60);
+			break;
+		case START_TIME_DIALOG_ID:
+			((TimePickerDialog) dialog).updateTime(mStartHour, mStopMinute);
+			break;
+		case STOP_TIME_DIALOG_ID:
+			((TimePickerDialog) dialog).updateTime(mStopHour, mStopMinute);
+			break;	
+		case START_DATE_DIALOG_ID:
+			((DatePickerDialog) dialog).updateDate(mYear, mMonth, mStartDay);
+			break;
+		case STOP_DATE_DIALOG_ID:
+			((DatePickerDialog) dialog).updateDate(mYear, mMonth, mStopDay);
+			break;
+		}
+	}
 
-    private void updateDisplay() {
-        dayDisplay.setText(
-            new StringBuilder()
-                    // Month is 0 based so add 1
-                    .append(mMonth + 1).append("-")
-                    .append(mDay).append("-")
-                    .append(mYear).append(" "));
-        
-        
-        durationDisplay.setText(
-                new StringBuilder()
-                        .append(pad(mHour)).append(":")
-                        .append(pad(mMinute)));
-    }
+	private void updateDisplay() {
+		setDuration.setText("Event length" + pad(duration/60)+":"+pad(duration%60));
+		setTimeStart.setText(""+pad(mStartHour)+":"+pad(mStartMinute));
+		setTimeEnd.setText(""+pad(mStopHour)+":"+pad(mStopMinute));
+		setDayStart.setText(new StringBuilder()
+		// Month is 0 based so add 1
+		.append(mMonth + 1).append("-").append(mStartDay).append("-")
+		.append(mYear).append(" "));
+		setDayEnd.setText(new StringBuilder()
+		// Month is 0 based so add 1
+		.append(mMonth + 1).append("-").append(mStopDay).append("-")
+		.append(mYear).append(" "));
+				
+	}
 
-    private DatePickerDialog.OnDateSetListener mDateSetListener =
-            new DatePickerDialog.OnDateSetListener() {
+	private DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener() {
+		
+		public void onDateSet(DatePicker view, int year, int monthOfYear,
+				int dayOfMonth) {
+			mYear = year;
+			mMonth = monthOfYear;
+			mStartDay = dayOfMonth;
+			updateDisplay();
+		}
+	};
 
-                public void onDateSet(DatePicker view, int year, int monthOfYear,
-                        int dayOfMonth) {
-                    mYear = year;
-                    mMonth = monthOfYear;
-                    mDay = dayOfMonth;
-                    updateDisplay();
-                }
-            };
+	private TimePickerDialog.OnTimeSetListener mDurationSetListener = new TimePickerDialog.OnTimeSetListener() {
 
-    private TimePickerDialog.OnTimeSetListener mTimeSetListener =
-            new TimePickerDialog.OnTimeSetListener() {
+		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+			mStartHour = hourOfDay;
+			mStartMinute = minute;
+			updateDisplay();
+		}
+	};
 
-                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                    mHour = hourOfDay;
-                    mMinute = minute;
-                    updateDisplay();
-                }
-            };
-
-    private static String pad(int c) {
-        if (c >= 10)
-            return String.valueOf(c);
-        else
-            return "0" + String.valueOf(c);
-    }
-
-
-
+	private static String pad(int c) {
+		if (c >= 10)
+			return String.valueOf(c);
+		else
+			return "0" + String.valueOf(c);
+	}
 
 	@Override
 	public void onClick(View v) {
@@ -143,13 +166,21 @@ public class NewMeetingActivity extends Activity implements OnClickListener{
 		case R.id.addPeopleButton:
 			startActivity(new Intent(this, MainActivity.class));
 			break;
-		case R.id.durationButton:	
-			showDialog(TIME_DIALOG_ID);
+		case R.id.durationButton:
+			showDialog(DURATION_DIALOG_ID, null);
 			break;
-		case R.id.dayButton:
-			showDialog(DATE_DIALOG_ID);
+		case R.id.startTimeButton:
+			showDialog(START_TIME_DIALOG_ID, null);
+			break;
+		case R.id.stopTimeButton:
+			showDialog(STOP_TIME_DIALOG_ID, null);
+			break;
+		case R.id.startDayButton:
+			showDialog(START_DATE_DIALOG_ID, null);
+			break;
+		case R.id.stopDayButton:
+			showDialog(STOP_DATE_DIALOG_ID, null);
 			break;
 		}
-		
 	}
 }
