@@ -139,6 +139,7 @@ class User
 					'meeting' => $meeting->id(),
 					'user' => $this->id ),
 				'single' => true ) ) )
+			return $from;
 		
 		// choose a valid unused candidate
 		// TODO
@@ -152,9 +153,6 @@ class User
 				'user' => $this->id,
 				$fromField => $from ),
 			array( 'meeting', 'user' ) );
-			
-		ErrorStack::dump();
-		exit;
 		
 		return $from;
 	}
@@ -215,7 +213,7 @@ class User
 				array( $meeting->creator()->name(), $this->name(), $meeting->name() ),
 				$smsMessages[ $messageID ] );
 			
-			echo 'Sending ' . $this->name() . " a text message for $messageID from $from<br />";			
+			echo 'Sending ' . $this->name() . " a text message for $messageID from $from<br />";
 			
 			// instantiate a new Twilio Rest Client
 			require 'Twilio.php';

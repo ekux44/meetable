@@ -110,7 +110,7 @@ class Meeting
 					'meeting' => $this->id,
 					'active' => 1 ),
 				'fetchStyle' => 'singleColumn' ) );
-			
+
 		$return = array();
 		
 		foreach( $attendees as $attendee )
@@ -147,6 +147,8 @@ class Meeting
 		{
 			$attendee->message( 'meeting-kick-off', $this );
 		}
+		
+		return true;
 	}
 	
 	function processResponse( $response, $method )

@@ -3,8 +3,16 @@
 // Command Line Calls only
 if( php_sapi_name() == 'cli' )
 	chdir(__DIR__);
-		
+
+// Configuration		
 DEFINE( 'HOST_NAME', 'meetable.io' );
+DEFINE( 'SITE_TITLE', 'Meetable' );
+DEFINE( 'SMTP_FROM_ADDRESS', 'no-reply@meetable.io' );
+DEFINE( 'SMTP_USERNAME', 'meetable' );
+DEFINE( 'SMTP_PASSWORD', '7nHHCkavhtv' );
+DEFINE( 'SMTP_PORT', 587 );
+DEFINE( 'SMTP_HOST', 'smtp.sendgrid.net' );
+
 ini_set('default_charset', 'utf-8');
 include_once('functions.php');
 
@@ -54,7 +62,7 @@ case 'sms':
 				'user = id',
 				'smsFrom' => $to,
 				'phone' => $from ),
-			'single' => true ) ) )
+			'singleRow' => true ) ) )
 	{
 		$body = val( $_REQUEST, 'Body' );
 		
@@ -67,11 +75,15 @@ case 'sms':
 				'meeting' =>  $info['meeting'],
 				'user' => $info['user'],
 				'response' => $body ) ) ) );
-		
 	}
 	
 	// return no message
+	header("content-type: text/xml");
 	echo '<?xml version="1.0" encoding="UTF-8" ?><Response></Response>';
+break;
+// e-mail response
+case 'email':
+
 break;
 // new meeting
 case 'new':
