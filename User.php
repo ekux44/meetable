@@ -12,6 +12,10 @@ class User
 	private static $ourEmailAddresses = array(
 		'test@test.com' );
 
+	private $id;	
+	private $info;
+	private $infoLoaded;
+
 	/**
 	 * Constructor
 	 *
@@ -135,8 +139,6 @@ class User
 					'meeting' => $meeting->id(),
 					'user' => $this->id ),
 				'single' => true ) ) )
-			return $from;
-			
 		
 		// choose a valid unused candidate
 		// TODO
@@ -150,6 +152,9 @@ class User
 				'user' => $this->id,
 				$fromField => $from ),
 			array( 'meeting', 'user' ) );
+			
+		ErrorStack::dump();
+		exit;
 		
 		return $from;
 	}
@@ -205,11 +210,10 @@ class User
 			
 			// generate the message
 			include_once 'messages.php';
-			$body = str_replace(
+			$message = str_replace(
 				array( '{CREATOR_NAME}', '{USER_NAME}', '{MEETING_NAME}' ),
 				array( $meeting->creator()->name(), $this->name(), $meeting->name() ),
-				$messages[ $messageID ] );
-			
+				$smsMessages[ $messageID ] );
 			
 			echo 'Sending ' . $this->name() . " a text message for $messageID from $from<br />";			
 			

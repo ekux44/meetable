@@ -45,7 +45,7 @@ foreach( (array)$responseQueue as $message )
 	// pre-load info
 	$meeting->loadInfo();
 
-	$meeting->processResponse( val( $response, 'response' ), val( $response, 'user' ), val( $response, 'from' ) );
+	$meeting->processResponse( val( $response, 'response' ), val( $response, 'user' ) );
 
 	// delete the message
 	$ironmq->deleteMessage( 'new-meetings', $message->id );

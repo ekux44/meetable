@@ -39,6 +39,40 @@ case 'api':
 	$version = urlParam( 2 );
 	print_pre('api call - version ' . $version);
 break;
+// sms response
+case 'sms':	
+	// TODO: sanitize phone numbers
+	$from = val( $_REQUEST, 'From' );
+	$to = val( $_REQUEST, 'To' );
+	
+	// figure out if the message is legitimate and what meeting it belongs to
+	if( $info = Database::select(
+		'Attendees JOIN Users ON id = user',
+		'meeting,user',
+		array(
+			'where' => array(
+				'user = id',
+				'smsFrom' => $to,
+				'phone' => $from ),
+			'single' => true ) ) )
+	{
+		$body = val( $_REQUEST, 'Body' );
+		
+		/* add the response to the message queue */
+		$ironmq = new IronMQ();
+		
+		// put the message on the queue
+		$ironmq->postMessage("responses", array(
+			'body' => json_encode( array(
+				'meeting' =>  $info['meeting'],
+				'user' => $info['user'],
+				'response' => $body ) ) ) );
+		
+	}
+	
+	// return no message
+	echo '<?xml version="1.0" encoding="UTF-8" ?><Response></Response>';
+break;
 // new meeting
 case 'new':
 	$data = array(

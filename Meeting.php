@@ -90,6 +90,16 @@ class Meeting
 		return ($htmlentities) ? htmlentities( $name ) : $name;
 	}
 	
+	/**
+	 * Gets the creator of the meeting
+	 *
+	 *
+	 */
+	function creator()
+	{
+		return new User( $this->info( 'creator' ) );
+	}
+	
 	function attendees()
 	{
 		$attendees = Database::select(
@@ -135,14 +145,26 @@ class Meeting
 		// send the initial message to all parties
 		foreach( $attendees as $attendee )
 		{
-			$attendee->message( 'initial-meeting', $this );
+			$attendee->message( 'meeting-kick-off', $this );
 		}
 	}
 	
-	function processResponse( $response, $method, $from )
+	function processResponse( $response, $method )
 	{
 		// check that the meeting is still active
 		
+		/*
+			What is the response responding to? Possibilities:
+			i) command
+			ii) time zone
+			iii) time
+		*/
+		
+		// command
+		
+		// time zone
+		
+		// time
 	}
 
 	static function create( $data )
@@ -156,7 +178,7 @@ class Meeting
 		// TODO
 				
 		// check for a valid time range
-		// TODO				
+		// TODO
 		
 		// ensure there is at least 1 attendee
 		if( count( $data[ 'attendeeNames' ] ) == 0 )
