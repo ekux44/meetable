@@ -7,26 +7,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.CharArrayBuffer;
 import android.database.Cursor;
-import android.database.MergeCursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.QuickContactBadge;
-import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,10 +28,8 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 
 	Button addPerson;
 	ListView addedPeople;
-	//ContactListItemAdapter adapter;
 	CustomAdapter adapter;
-	Cursor[] cray;
-	MergeCursor mergeCursor;
+	
 
 	Toast mToast;
 	ResultDisplayer mPendingResult;
@@ -102,19 +94,30 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 							CONTACTS_SUMMARY_PROJECTION, null, null, null);
 					Log.e("fdsa",""+c.getCount());
 					
-					if (c.moveToFirst()) // data?
-						   System.out.println(c.getInt(SUMMARY_ID_COLUMN_INDEX)); 
+					if (!c.moveToFirst()) 
+						return;
+					System.out.println(c.getInt(SUMMARY_ID_COLUMN_INDEX)); 
 					int myId = (int)c.getInt(SUMMARY_ID_COLUMN_INDEX);
+					ContactListItem guy = new ContactListItem();
+					guy.name = ""+c.getString(SUMMARY_NAME_COLUMN_INDEX);
 					
-					
-					/*c = getContentResolver().query(Data.CONTENT_URI,
+					c = getContentResolver().query(Data.CONTENT_URI,
 					          new String[] {Data._ID, Phone.NUMBER, Phone.TYPE, Phone.LABEL},
 					          Data.CONTACT_ID + "=?" + " AND "
 					                  + Data.MIMETYPE + "='" + Phone.CONTENT_ITEM_TYPE + "'",
 					          new String[] {String.valueOf(myId)}, null);
-					*/
 					
-					ContactListItem a = new ContactListItem();
+					
+					
+					
+					
+					if (!c.moveToFirst()) 
+						return;
+					
+					guy.contactInfo = c.getString(1);
+					adapter.add(guy);
+					
+					
 					/*if(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)>0)
 					{
 						
@@ -128,48 +131,6 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 						
 					}
 					*/
-					a.name = ""+c.getString(SUMMARY_NAME_COLUMN_INDEX);
-					a.contactInfo = "";
-					adapter.add(a);
-					
-					
-					//mergeCursor.requery();
-				//	Cursor[] crazy = new Cursor[1];//2];
-				//	crazy[0]= mergeCursor;
-					//crazy[1] = c;
-				//	mergeCursor = new MergeCursor(crazy);
-				//	startManagingCursor(mergeCursor);
-				//	adapter.changeCursor(mergeCursor);
-					
-				/*
-					
-					
-					addedPeople = ((ListView) findViewById(R.id.addedPeopleListView));
-					String select = "((" + Contacts.DISPLAY_NAME + " NOTNULL) AND ("
-							+ Contacts.HAS_PHONE_NUMBER + "=0) AND ("
-							+ Contacts.DISPLAY_NAME + " != '' ))";
-					 c = getContentResolver().query(Contacts.CONTENT_URI,
-							CONTACTS_SUMMARY_PROJECTION, select, null,
-							Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC");
-					
-					cray =new Cursor[1];
-					cray[0]=c;
-					
-					Log.e("fdsa",""+c.getCount());
-					
-					MergeCursor localmergeCursor = new MergeCursor(cray);
-					adapter.getCursor().moveToFirst();
-					//adapter.changeCursor(c);
-					adapter.notifyDataSetChanged();
-					adapter.changeCursor(mergeCursor);*/
-					
-				//	startManagingCursor(c);
-					//ContactListItemAdapter adapter = new ContactListItemAdapter(this,
-					//		R.layout.quick_contacts, c);
-				//	startManagingCursor(mergeCursor);
-		//			adapter = new ContactListItemAdapter(this,
-		//					R.layout.quick_contacts, mergeCursor);
-		//			addedPeople.setAdapter(adapter);
 					
 					
 					
