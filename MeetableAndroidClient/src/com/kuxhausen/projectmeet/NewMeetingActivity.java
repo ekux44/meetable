@@ -82,16 +82,16 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 			return new TimePickerDialog(this, mDurationSetListener, duration/60, duration%60,
 					true);
 		case START_TIME_DIALOG_ID:
-			return new TimePickerDialog(this, mDurationSetListener, mStartHour, mStartMinute,
+			return new TimePickerDialog(this, mStartTimeSetListener, mStartHour, mStartMinute,
 					false);
 		case STOP_TIME_DIALOG_ID:
-			return new TimePickerDialog(this, mDurationSetListener, mStopHour, mStopMinute,
+			return new TimePickerDialog(this, mStopTimeSetListener, mStopHour, mStopMinute,
 					false);
 		case START_DATE_DIALOG_ID:
-			return new DatePickerDialog(this, mDateSetListener, mYear, mMonth,
+			return new DatePickerDialog(this, mStartDateSetListener, mYear, mMonth,
 					mStartDay);
 		case STOP_DATE_DIALOG_ID:
-			return new DatePickerDialog(this, mDateSetListener, mYear, mMonth,
+			return new DatePickerDialog(this, mStopDateSetListener, mYear, mMonth,
 				mStopDay);
 		}
 		return null;
@@ -119,7 +119,7 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 	}
 
 	private void updateDisplay() {
-		setDuration.setText("Event length" + pad(duration/60)+":"+pad(duration%60));
+		setDuration.setText("Event length : " + (duration/60)+":"+pad(duration%60));
 		setTimeStart.setText(""+pad(mStartHour)+":"+pad(mStartMinute));
 		setTimeEnd.setText(""+pad(mStopHour)+":"+pad(mStopMinute));
 		setDayStart.setText(new StringBuilder()
@@ -133,7 +133,7 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 				
 	}
 
-	private DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener() {
+	private DatePickerDialog.OnDateSetListener mStartDateSetListener = new DatePickerDialog.OnDateSetListener() {
 		
 		public void onDateSet(DatePicker view, int year, int monthOfYear,
 				int dayOfMonth) {
@@ -143,12 +143,37 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 			updateDisplay();
 		}
 	};
+private DatePickerDialog.OnDateSetListener mStopDateSetListener = new DatePickerDialog.OnDateSetListener() {
+		
+		public void onDateSet(DatePicker view, int year, int monthOfYear,
+				int dayOfMonth) {
+			mYear = year;
+			mMonth = monthOfYear;
+			mStopDay = dayOfMonth;
+			updateDisplay();
+		}
+	};
 
 	private TimePickerDialog.OnTimeSetListener mDurationSetListener = new TimePickerDialog.OnTimeSetListener() {
 
 		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+			duration = hourOfDay*60 + minute;
+			updateDisplay();
+		}
+	};
+	private TimePickerDialog.OnTimeSetListener mStartTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
+
+		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 			mStartHour = hourOfDay;
 			mStartMinute = minute;
+			updateDisplay();
+		}
+	};
+	private TimePickerDialog.OnTimeSetListener mStopTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
+
+		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+			mStopHour = hourOfDay;
+			mStopMinute = minute;
 			updateDisplay();
 		}
 	};

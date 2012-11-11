@@ -47,21 +47,21 @@
                     android:layout_weight="1"
                     android:text="@string/start_time"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
-
+
                 <Button
                     android:id="@+id/startTimeButton"
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_weight="2"
                     android:text="@string/invisible" />
-
+
                 <Button
                     android:id="@+id/startDayButton"
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_weight="2"
                     android:text="@string/invisible" />
 
             </LinearLayout>
@@ -78,21 +78,21 @@
                     android:layout_weight="1"
                     android:text="@string/stop_time"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
-
+
                 <Button
                     android:id="@+id/stopTimeButton"
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_weight="2"
                     android:text="@string/invisible" />
-
+
                 <Button
                     android:id="@+id/stopDayButton"
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_weight="2"
                     android:text="@string/invisible" />
 
             </LinearLayout>
