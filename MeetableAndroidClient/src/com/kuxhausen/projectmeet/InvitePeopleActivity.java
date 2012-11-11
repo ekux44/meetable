@@ -49,7 +49,9 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 
 	Button addPerson;
 	ListView addedPeople;
+	ArrayList<Person> pList;
 	CustomAdapter adapter;
+	
 	
 	Meeting theMeeting;
 
@@ -88,13 +90,10 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 		Button sendInvities = ((Button) findViewById(R.id.launchInvitesButton));
 		sendInvities.setOnClickListener(this);
 		
-		ArrayList<ContactListItem> aList = new ArrayList<ContactListItem>();
-		ContactListItem a = new ContactListItem();
-		a.name = "eric";
-		a.contactInfo = "832.552.7666";
-		aList.add(a);
+		pList =  new ArrayList<Person>();
+				
 		adapter = new CustomAdapter(this,
-				R.layout.quick_contacts, aList);
+				R.layout.quick_contacts, pList);
 		addedPeople = ((ListView) findViewById(R.id.addedPeopleListView));
 		addedPeople.setAdapter(adapter);
 	}
@@ -126,7 +125,7 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 	    try {
 	      
 	    	List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-	        nameValuePairs.add(new BasicNameValuePair("data", theMeeting.toJSON().toString()));
+	        nameValuePairs.add(new BasicNameValuePair("data", theMeeting.toJSON(pList).toString()));
 	        httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));    	
 	    	
 	    	HttpResponse response = client.execute(httpPost);
@@ -188,7 +187,7 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 						return;
 					System.out.println(c.getInt(SUMMARY_ID_COLUMN_INDEX)); 
 					int myId = (int)c.getInt(SUMMARY_ID_COLUMN_INDEX);
-					ContactListItem guy = new ContactListItem();
+					Person guy = new Person();
 					guy.name = ""+c.getString(SUMMARY_NAME_COLUMN_INDEX);
 					
 					c = getContentResolver().query(Data.CONTENT_URI,
@@ -202,9 +201,9 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 					if (!c.moveToFirst()) 
 						return;
 					
-					guy.contactInfo = c.getString(1);
+					guy.number = c.getString(1);
 					adapter.add(guy);
-					
+					//pList.add(guy);
 					
 					/*if(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)>0)
 					{
@@ -250,11 +249,11 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 	static final int SUMMARY_HAS_PHONE_COLUMN_INDEX = 3;
 
 	
-		public class CustomAdapter extends ArrayAdapter<ContactListItem>{
-		    private ArrayList<ContactListItem> entries;
+		public class CustomAdapter extends ArrayAdapter<Person>{
+		    private ArrayList<Person> entries;
 		    private Activity activity;
 		 
-		    public CustomAdapter(Activity a, int textViewResourceId, ArrayList<ContactListItem> entries) {
+		    public CustomAdapter(Activity a, int textViewResourceId, ArrayList<Person> entries) {
 		        super(a, textViewResourceId, entries);
 		        this.entries = entries;
 		        this.activity = a;
@@ -281,19 +280,23 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 		        else
 		            holder=(ViewHolder)v.getTag();
 		 
-		        final ContactListItem custom = entries.get(position);
+		        final Person custom = entries.get(position);
 		        if (custom != null) {
 		            holder.item1.setText(custom.name);
-		            holder.item2.setText(custom.contactInfo);
+		            if(theMeeting.preferSMS && custom.number.length()>0)
+		            	holder.item2.setText(custom.number);
+		            else
+		            	holder.item2.setText(custom.email);
 		        }
 		        return v;
 		    }
 		}
-	final static class ContactListItem {
-		public TextView nameView;
-		public String name;
-		public String contactInfo;
-		//public QuickContactBadge photoView;
-		public CharArrayBuffer nameBuffer = new CharArrayBuffer(128);
+	
 	}
+	final class Person {
+	
+	public String name;
+	public String number;
+	public String email;
+	//public QuickContactBadge photoView;
 }

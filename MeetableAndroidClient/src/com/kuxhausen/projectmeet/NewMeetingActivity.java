@@ -1,6 +1,10 @@
 package com.kuxhausen.projectmeet;
 
 import java.util.Calendar;
+import java.util.regex.Pattern;
+
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -9,6 +13,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -195,8 +201,18 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 		switch (v.getId()) {
 		case R.id.addPeopleButton:
 			
+			Pattern emailPattern = Patterns.EMAIL_ADDRESS; // API level 8+
+			Account[] accounts = AccountManager.get(this).getAccounts();
+			loop : for (Account account : accounts) {
+			    if (emailPattern.matcher(account.name).matches()) {
+			        m.hostEmail = account.name;
+			        break loop;
+			    }
+			} 
+			
+		    
+			
 			TelephonyManager telephonyManager = (TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE);
-
 			m.hostNumber = telephonyManager.getLine1Number();
 			
 			m.meetingName = meetingName.getText().toString();
@@ -204,9 +220,9 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 			m.autoSelectBestTime = autoSelect.isChecked();
 			
 			if(((RadioButton)contactMethod.getChildAt(1)).isChecked())	
-				m.preferSMS = false;
-			else
 				m.preferSMS = true;
+			else
+				m.preferSMS = false;
 			
 			Intent i = new Intent(this, InvitePeopleActivity.class);
 			i.putExtra("theMeeting", m);
