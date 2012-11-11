@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Meet ____</title>
+	<title>Meetable</title>
 	
 	<link href="/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
 	<link href="/css/bootstrap-responsive.min.css" type="text/css" rel="stylesheet" />
@@ -17,7 +17,7 @@
 </head>
 <body>
 <div class="container">
-	<h1>Meet ____</h1>
+	<h1>Meetable</h1>
 	<form action="/new" method="post">
 		<p>
 			<label>What is the name of this meeting?</label>

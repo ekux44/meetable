@@ -199,23 +199,29 @@ class User
 		$email = $this->info( 'email' );
 		
 		if( $phone )
-		{
-			echo 'Sending ' . $this->name() . ' a text message for ' . $messageID . '<br />';
-			
+		{			
 			// get a phone number to contact this user from
 			$from = $this->getUniqueFrom( $meeting, 'phone' );
 			
+			// generate the message
+			include_once 'messages.php';
+			$body = str_replace(
+				array( '{CREATOR_NAME}', '{USER_NAME}', '{MEETING_NAME}' ),
+				array( $meeting->creator()->name(), $this->name(), $meeting->name() ),
+				$messages[ $messageID ] );
+			
+			
+			echo 'Sending ' . $this->name() . " a text message for $messageID from $from<br />";			
+			
 			// instantiate a new Twilio Rest Client
+			require 'Twilio.php';
 			$client = new Services_Twilio( 'ACef536c27dac7efda7fe758844e6665ef', 'dd5ca9994edbb122adcd294c81c8524a' );
 			
 			// send the message
 			$sms = $client->account->sms_messages->create(
-				// from phone number (ours)
-				"YYY-YYY-YYYY",
-				// the number we are sending to (theirs)
-				$phone,
-				// the sms body
-				"Hey " . $this->name() . ", Monkey Party at 6PM. Bring Bananas!"
+				$from, // from phone number (ours)
+				$phone, // the number we are sending to (theirs)
+				$message // the sms body
 			);
 		}
 		

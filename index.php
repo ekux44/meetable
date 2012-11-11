@@ -4,7 +4,7 @@
 if( php_sapi_name() == 'cli' )
 	chdir(__DIR__);
 		
-DEFINE( 'HOST_NAME', 'hack.nfuseweb.com' );
+DEFINE( 'HOST_NAME', 'meetable.io' );
 ini_set('default_charset', 'utf-8');
 include_once('functions.php');
 

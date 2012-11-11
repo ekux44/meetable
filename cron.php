@@ -35,7 +35,7 @@ foreach( (array)$newMeetingQueue as $message )
 foreach( (array)$responseQueue as $message )
 {
 	echo "Processing response:<br />";
-	print_pre($message); 
+	print_pre($message);
 
 	// decode the message
 	$response = json_decode( $message->body, true );

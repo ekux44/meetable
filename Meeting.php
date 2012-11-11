@@ -112,6 +112,16 @@ class Meeting
 		
 		return $return;
 	}
+	
+	/**
+	 * Checks if the meeting is still active
+	 *
+	 *
+	 */
+	function active()
+	{
+		// todo
+	}
 
 	//////////////////////////////
 	// SETTERS
@@ -131,7 +141,8 @@ class Meeting
 	
 	function processResponse( $response, $method, $from )
 	{
-	
+		// check that the meeting is still active
+		
 	}
 
 	static function create( $data )
