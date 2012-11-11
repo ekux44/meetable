@@ -166,6 +166,17 @@ class Meeting
 					'single' => true ) ) > time();
 	}
 	
+	function getInitialTimeFrame()
+	{
+		return Database::select(
+			'Time_Frame AS f JOIN Meetings AS m ON m.time_frame = f.id',
+			'f.start,f.end',
+			array(
+				'where' => array(
+					'm.id' => $this->id ),
+				'singleRow' => true ) );
+	}
+	
 	/**
 	 * Get the time frame for which there are no conflicts
 	 *
@@ -174,18 +185,15 @@ class Meeting
 	function getValidTimeFrame( $humanReadable = false )
 	{
 		// get our initial parameters
-		$initialTimeFrame = Database::select(
-			'Time_Frame AS f JOIN Meetings AS m ON m.time_frame = f.id',
-			'f.start,f.end',
-			array(
-				'where' => array(
-					'm.id' => $this->id ),
-				'singleRow' => true ) );
+		$initialTimeFrame = $this->getInitialTimeFrame();
 		
-		// return the inital time frame if necessary
+		// start with the initial parameters
 		$return = array(
 			'start' => $initialTimeFrame[ 'start' ],
 			'end' => $initialTimeFrame[ 'end' ] );
+		
+		if( $initialTimeFrame[ 'start' ] == $initialTimeFrame[ 'end' ] )
+			return $return;
 		
 		// get the time frames of all the users
 		$timeFrames = Database::select(
@@ -197,15 +205,27 @@ class Meeting
 		
 		foreach( $timeFrames as $frame )
 		{
-			// update the start time to the LCD
-			if( $frame[ 'start' ] > $return[ 'start' ] && $frame[ 'start' ] < $frame[ 'end' ] )
-				$return[ 'start' ] = $frame[ 'start' ];
-			
-			// update the end time to the LCD
-			if( $frame[ 'end' ] < $return[ 'end' ] && $frame[ 'end' ] > $frame[ 'start' ] )
-				$return[ 'end' ] = $frame[ 'end' ];
-		}
+			if( $frame[ 'start' ] < $frame[ 'end' ] )
+			{
+				// update the start time if it shrinks the window
+				if( $frame[ 'start' ] > $return[ 'start' ] )
+					$return[ 'start' ] = $frame[ 'start' ];
 				
+				// update the end time if it shrinks the window
+				if( $frame[ 'end' ] < $return[ 'end' ] )
+					$return[ 'end' ] = $frame[ 'end' ];
+					
+				// there is an inconsistency, no possible time frame
+				if( $frame[ 'start' ] > $return[ 'end' ] || $frame[ 'end' ] < $return[ 'start' ] )
+				{
+					if( $humanReadable )
+						return 'no valid times';
+					else
+						return false;
+				}
+			}
+		}
+		
 		if( $humanReadable )
 			return $this->humanReadableRange( $return );
 		else
@@ -259,7 +279,56 @@ class Meeting
 	 */
 	function solution()
 	{
-		return array( 'status' => 'solvable' );
+		/* Possible solutions states:
+			i) solved
+			ii) partially solved (everyone has pitched in)
+			iii) solvable (in progress)
+			iv) unsolvable
+		*/
+		
+		$timeRange = $this->getValidTimeFrame();
+		// if no time range, we are screwed
+		if( !$timeRange )
+		{
+			return array( 'status' => 'unsolvable' );
+		}
+		// an exact solution exists
+		else if( $timeRange[ 'start' ] == $timeRange[ 'end' ] )
+		{
+			return array( 'status' => 'solved', 'solution' => $timeRange[ 'start' ] );
+		}
+		// everyone has participated and there is a time frame
+		else if( Database::select(
+			'Meetings as m',
+			'count(*)',
+			array(
+				'where' => array(
+					'm.id' => $this->id,
+					'NOT EXISTS (
+						SELECT *
+						FROM Attendees as a JOIN Time_Frame AS f ON f.id = a.time_frame
+						WHERE a.meeting = m.id AND a.creator = 0 )' ),
+				'single' => true ) ) == 0 )
+		{
+			// automatically pick a solution?
+			if( $this->info( 'narrowToOne' ) == 0 )
+			{
+				// todo: we could make this random
+				$solution = $timeRange[ 'start' ];
+				
+				return array( 'status' => 'solved', 'solution' => $solution );
+			}
+			// offer the creator a chance to solve
+			else
+			{
+				return array( 'status' => 'partially-solved' );
+			}
+		}
+		// not everyone has pitched in
+		else
+		{
+			return array( 'status' => 'solvable' );
+		}
 	}
 
 	//////////////////////////////
@@ -288,6 +357,13 @@ class Meeting
 	function processResponse( $response, $user, $method )
 	{
 		// check that the meeting is still active
+		if( !$this->active() )
+		{
+			// notify the user of their mistake
+			$user->message( 'bad-input', $this, $method );
+			
+			return true;
+		}
 		
 		/*
 			What does the response want to do? Possibilities:
@@ -314,7 +390,7 @@ class Meeting
 		// error
 		else
 		{
-			// notify the user
+			// notify the user of their mistake
 			$user->message( 'bad-input', $this, $method );
 		}
 		
@@ -677,13 +753,7 @@ class Meeting
 	function generateTimeRange( $time )
 	{
 		// get our initial parameters
-		$initialTimeFrame = Database::select(
-			'Time_Frame AS f JOIN Meetings AS m ON m.time_frame = f.id',
-			'f.start,f.end',
-			array(
-				'where' => array(
-					'm.id' => $this->id ),
-				'singleRow' => true ) );
+		$initialTimeFrame = $this->getInitialTimeFrame();
 				
 		$return = array( 'start' => $initialTimeFrame[ 'start' ], 'end' => $initialTimeFrame[ 'end' ] );
 		
@@ -743,31 +813,61 @@ class Meeting
 	 */
 	private function registerTime( $time, $user, $method)
 	{
-		// is the time within our bounds?
-		if( !withinBounds() )
-		{
-			// give the user an error message
-			$user->message( 'bad-time', $this, $method );
-			
-			return true;
-		}
+		$timeAlreadyUpdated = false;
 		
 		// are we talking to the creator?
 		if( $user->id() == $this->creator()->id() )
 		{
-			// has everyone chosen?
-			if( everyoneChosen() )
+			// what is the solution state?
+			$solution = $this->solution();
+			$proposedTime = $this->getTime( $time );
+			$bounds = $this->getValidTimeFrame();
+			
+			// set the time range to the creator's choice, within the bounds
+			if( ( $solution['status'] == 'partially-solved' && $proposedTime > $bounds[ 'start' ] && $proposedTime < $bounds[ 'end' ] ) ||
+			// the creator has free reign on the time as long as it is in the future
+				( $solution['status'] == 'unsolvable' && $proprosedTime > time() ) )
 			{
-				// set the time range to the creator's choice
+				// set the time for the meeting
+				Database::update(
+					'Time_Frame',
+					array(
+						'id' => $this->info('time_frame'),
+						'start' => $proposedTime,
+						'end' => $proposedTime ),
+					array( 'id' ) );
+					
+				$timeAlreadyUpdated = true;
+			}
+			// hopefully we do not get here
+			else if( $solution['status'] == 'solved' )
+			{
+				return true;
 			}
 			else
+			{
+				// give the user an error message
+				$user->message( 'bad-time', $this, $method );
+			
 				return true;
+			}
 		}
 		else
 		{
 			// generate the time range
 			$timeRange = $this->generateTimeRange( $time );
 			
+			// check that we are within the bounds
+			$bounds = $this->getValidTimeFrame();
+
+			if( $timeRange[ 'start' ] <= $timeRange[ 'end' ] && ( $timeRange[ 'start' ] > $bounds[ 'end' ] || $timeRange[ 'end' ] < $bounds[ 'start' ] ) )
+			{
+				// give the user an error message
+				$user->message( 'bad-time', $this, $method );
+				
+				return true;			
+			}
+						
 			// TODO: this would be more efficient if time ranges were built into the attendee and meeting objects
 				
 			// delete any previous time ranges for the user
@@ -797,45 +897,76 @@ class Meeting
 					'meeting' => $this->id,
 					'time_frame' => Database::lastInsertId() ),
 				array( 'user', 'meeting' ) );
+				
+			// confirm the time with the user
+			$user->message( 'confirm-time', $this, $method );				
 		}
 	
 		/*
 			How does this time entry affect the problem? Does it make it:
 			i) solved
-			ii) solvable
-			iii) unsolvable
+			ii) partially solved (everyone has pitched in)
+			iii) solvable (in progress)
+			iv) unsolvable
 		*/
 		
 		$solution = $this->solution();
 		
 		// solved
+		// ** THIS IS WHERE WE WANT TO END UP
 		if( $solution[ 'status' ] == 'solved' )
 		{
-			// confirm the time with everyone
+			// mark the project as solved
+			Database::update(
+				'Meetings',
+				array(
+					'id' => $this->id,
+					'status' => 1 ),
+				array( 'id' ) );
 			
+			// set the time
+			if( $timeAlreadyUpdated )
+				Database::update(
+					'Time_Frame',
+					array(
+						'id' => $this->info('time_frame'),
+						'start' => $solution['solution'],
+						'end' => $solution['solution'] ),
+					array( 'id' ) );
+			
+			// confirm the time with everyone
+			foreach( $this->attendees() as $attendee )
+				$attendee->message( 'solution-found', $this, 'both', date( 'l, F j, Y g:i A', $solution['solution'] ) );
+			
+			return true;
+		}
+		else if( $solution[ 'status' ] == 'partially-solved' )
+		{
+			// give the organizer the ability to choose within range of available times
+			$this->creator()->message( 'partially-solved-choice', $this );
+			
+			return true;
 		}
 		// solvable
 		else if( $solution[ 'status' ] == 'solvable' )
 		{
 			// give everyone a status update with the current time window
+			foreach( $this->attendees() as $attendee )
+				$attendee->message( 'status', $this );
 			
-			// if everyone has pitched in, give the organizer the ability to choose within range
-			
-			
+			return true;
 		}
 		// unsolvable
 		else
 		{
 			// shit
 			
-			// ask everyone nicely to re-evaluate their lives
-			
 			// give the creator the opportunity to manually set the time or cancel the meeting
+			$this->creator()->message( 'unsolvable-choice', $this );
+			
+			return true;
 		}
-		
-		// confirm the time with the user
-		$user->message( 'confirm-time', $this, $method );
-		
+				
 		return true;
 	}
 }

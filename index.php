@@ -105,7 +105,8 @@ case 'sms':
 			'where' => array(
 				'user = id',
 				'smsFrom' => $to,
-				'phone' => $from ),
+				'phone' => $from,
+				'active' => 1 ),
 			'singleRow' => true ) ) )
 	{
 		$body = val( $_REQUEST, 'Body' );

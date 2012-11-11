@@ -148,9 +148,19 @@ class User
 		
 		// choose a valid unused candidate
 		$from = reset( $valid );
+		$found = false;
 		
 		foreach( $valid as $f )
-		{	
+		{
+		/*
+		SELECT DISTINCT count(*)
+FROM Attendees AS a1
+WHERE NOT EXISTS (
+    SELECT *
+    FROM Attendees AS a2 JOIN Meetings as m ON a2.meeting = m.id JOIN Time_Frame as t ON m.time_frame = t.id
+    WHERE ( m.status <> 0 OR t.end > '1352639931' ) AND ( active = 1 AND a2.user = a1.user AND a1.smsFrom = '19183763309' ) )
+AND a1.user = 33
+*/
 			// check that the address is not in use by the attendee with:
 			// i) unsolved meeting
 			// ii) unexpired meeting
@@ -160,18 +170,21 @@ class User
 				array(
 					'where' => array(
 						'a1.user' => $this->id,
-						"a1.$fromField" => $f,
 						"NOT EXISTS (
 							SELECT *
 							FROM Attendees AS a2 JOIN Meetings as m ON a2.meeting = m.id JOIN Time_Frame as t ON m.time_frame = t.id
-							WHERE meeting.status <> 0 OR t.end <= '" . time() . "' AND a2.user = a1.user )"
+							WHERE ( m.status <> 0 OR t.end > '" . time() . "' ) AND ( a2.active = 1 AND a2.user = a1.user AND a1.$fromField = '$f' ) )"
 					),
-					'single' => true ) ) == 1 )
+					'single' => true ) ) > 0 )
 			{
 				$from = $f;
+				$found = true;
 				break;
 			}
 		}
+
+		if( !$found )
+			return false;
 		
 		// save for the future
 		Database::update(
@@ -224,7 +237,7 @@ class User
 	 * Sends the user a message about a meeting
 	 *
 	 */
-	function message( $messageID, $meeting, $method = 'both' )
+	function message( $messageID, $meeting, $method = 'both', $solution = null )
 	{
 		// get all of the contact methods for the user
 		$phone = $this->info( 'phone' );
@@ -242,10 +255,17 @@ class User
 			// get a phone number to contact this user from
 			$from = $this->getUniqueFrom( $meeting, 'phone' );
 			
+			if( !$from )
+			{
+				// send the user an error message
+				$messageID = 'exceeded-max-meetings';
+				$from = reset( self::$ourPhoneNumbers );
+			}
+			
 			// generate the message
 			$message = str_replace(
-				array( '{CREATOR_NAME}', '{USER_NAME}', '{MEETING_NAME}', '{MEETING_RANGE}', '{MEETING_LENGTH}', '{USER_RANGE}' ),
-				array( $creatorName, $userName, $meetingName, $meetingRange, $meetingLength, $userRange ),
+				array( '{CREATOR_NAME}', '{USER_NAME}', '{MEETING_NAME}', '{MEETING_RANGE}', '{MEETING_LENGTH}', '{USER_RANGE}', '{SOLUTION}' ),
+				array( $creatorName, $userName, $meetingName, $meetingRange, $meetingLength, $userRange, $solution ),
 				MeetableMessages::$smsMessages[ $messageID ] );
 			
 			echo 'Sending ' . $this->name() . " a text message for $messageID from $from<br />";
@@ -286,10 +306,17 @@ class User
 			// get a phone number to contact this user from
 			$from = $this->getUniqueFrom( $meeting, 'email' );
 			
+			if( !$from )
+			{
+				// send the user an error message
+				$messageID = 'exceeded-max-meetings';
+				$from = reset( self::$ourEmailAddresses );
+			}			
+			
 			// generate the message
 			$message = str_replace(
-				array( '{CREATOR_NAME}', '{USER_NAME}', '{MEETING_NAME}', '{MEETING_RANGE}', '{MEETING_LENGTH}', '{USER_RANGE}' ),
-				array( $creatorName, $userName, $meetingName, $meetingRange, $meetingLength, $userRange ),
+				array( '{CREATOR_NAME}', '{USER_NAME}', '{MEETING_NAME}', '{MEETING_RANGE}', '{MEETING_LENGTH}', '{USER_RANGE}', '{SOLUTION}' ),
+				array( $creatorName, $userName, $meetingName, $meetingRange, $meetingLength, $userRange, $solution ),
 				MeetableMessages::$emailMessages[ $messageID ] );
 			
 			echo 'Sending ' . $this->name() . ' an e-mail for ' . $messageID . '<br />';
@@ -301,8 +328,8 @@ class User
 			$mail->From = $from;
 			$mail->FromName = $meeting->creator()->name();
 			$mail->Subject = str_replace(
-				array( '{CREATOR_NAME}', '{USER_NAME}', '{MEETING_NAME}', '{MEETING_RANGE}', '{MEETING_LENGTH}', '{USER_RANGE}' ),
-				array( $creatorName, $userName, $meetingName, $meetingRange, $meetingLength, $userRange ),
+				array( '{CREATOR_NAME}', '{USER_NAME}', '{MEETING_NAME}', '{MEETING_RANGE}', '{MEETING_LENGTH}', '{USER_RANGE}', '{SOLUTION}' ),
+				array( $creatorName, $userName, $meetingName, $meetingRange, $meetingLength, $userRange, $solution ),
 				MeetableMessages::$emailSubjects[ $messageID ] );
 			
 			// text body
