@@ -2,6 +2,16 @@
 
 class User
 {
+	private static $ourPhoneNumbers = array(
+		'19183763307',
+		'19183763309',
+		'19183767984',
+		'19187169428',
+		'19185746923' );
+	
+	private static $ourEmailAddresses = array(
+		'test@test.com' );
+
 	/**
 	 * Constructor
 	 *
@@ -28,7 +38,7 @@ class User
 	}
 	
 	/**
-	 * Caches all of the columns from the main List table
+	 * Caches all of the columns from the main Users table
 	 *
 	 * @return bool Indicates if the information was loaded successfully
 	 */
@@ -53,7 +63,7 @@ class User
 	}
 	
 	/**
-	 * Gets a column from the main List table
+	 * Gets a column from the main Users table
 	 *
 	 * @param $piece Column name
 	 *
@@ -75,6 +85,73 @@ class User
 		$this->info[ $piece ] = $value;
 
 		return $value;
+	}
+	
+	/**
+	 * Gets the user name
+	 *
+	 * @param boolean $strip_chars true if 
+	 *
+	 * @return string|false Name of the list or error
+	 */
+	function name( $htmlentities = true )
+	{
+		$name = stripslashes( $this->info( 'name' ) );
+		return ($htmlentities) ? htmlentities( $name ) : $name;
+	}
+	
+	/**
+	 * Gets a unique number/email to contact the user with
+	 *
+	 *
+	 */
+	function getUniqueFrom( $meeting, $type )
+	{
+		$valid = array();
+		$fromField = '';
+		
+		if( $type == 'phone' )
+		{
+			// our numbers
+			$valid = self::$ourPhoneNumbers;
+			shuffle($valid); // shuffle
+			
+			$fromField = 'smsFrom';
+		} elseif( $type == 'email' )
+		{
+			$valid = self::$ourEmailAddresses;
+			
+			$fromField = 'emailFrom';
+		}
+		else
+			return false;
+		
+		// check if the user already has a from setup for this meeting
+		if( $from = Database::select(
+			'Attendees',
+			$fromField,
+			array(
+				'where' => array(
+					'meeting' => $meeting->id(),
+					'user' => $this->id ),
+				'single' => true ) ) )
+			return $from;
+			
+		
+		// choose a valid unused candidate
+		// TODO
+		$from = reset( $valid );
+		
+		// save for the future
+		Database::update(
+			'Attendees',
+			array(
+				'meeting' => $meeting->id(),
+				'user' => $this->id,
+				$fromField => $from ),
+			array( 'meeting', 'user' ) );
+		
+		return $from;
 	}
 
 	////////////////////
@@ -123,14 +200,28 @@ class User
 		
 		if( $phone )
 		{
-			echo 'Sending ' . $this->name() . ' a text message<br />';
+			echo 'Sending ' . $this->name() . ' a text message for ' . $messageID . '<br />';
 			
 			// get a phone number to contact this user from
+			$from = $this->getUniqueFrom( $meeting, 'phone' );
+			
+			// instantiate a new Twilio Rest Client
+			$client = new Services_Twilio( 'ACef536c27dac7efda7fe758844e6665ef', 'dd5ca9994edbb122adcd294c81c8524a' );
+			
+			// send the message
+			$sms = $client->account->sms_messages->create(
+				// from phone number (ours)
+				"YYY-YYY-YYYY",
+				// the number we are sending to (theirs)
+				$phone,
+				// the sms body
+				"Hey " . $this->name() . ", Monkey Party at 6PM. Bring Bananas!"
+			);
 		}
 		
 		if( $email )
 		{
-			echo 'Sending ' . $this->name() . ' an e-mail<br />';
+			echo 'Sending ' . $this->name() . ' an e-mail for ' . $messageID . '<br />';
 		
 		
 		}

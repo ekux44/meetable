@@ -31,7 +31,7 @@ class Meeting
 	}
 	
 	/**
-	 * Caches all of the columns from the main List table
+	 * Caches all of the columns from the main Meeting table
 	 * @return bool Indicates if the information was loaded successfully
 	 */
 	function loadInfo()
@@ -55,7 +55,7 @@ class Meeting
 	}
 	
 	/**
-	 * Gets a column from the main List table
+	 * Gets a column from the main Meetings table
 	 * @param $piece Column name
 	 * @return string|null Requested info or not found
 	 */
@@ -78,18 +78,16 @@ class Meeting
 	}
 	
 	/**
-	 * Gets the list name
+	 * Gets the meeting name
 	 *
 	 * @param boolean $strip_chars true if 
 	 *
 	 * @return string|false Name of the list or error
 	 */
-	function name( $strip_chars = true )
+	function name( $htmlentities = true )
 	{
-		if( $this->permission()->canView(false) )
-			return htmlspecialchars( stripslashes( $this->info( 'name' ) ) );
-	
-		return false;
+		$name = stripslashes( $this->info( 'name' ) );
+		return ($htmlentities) ? htmlentities( $name ) : $name;
 	}
 	
 	function attendees()
