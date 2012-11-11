@@ -29,6 +29,7 @@ import android.database.CharArrayBuffer;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
@@ -50,6 +51,7 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 	ListView addedPeople;
 	CustomAdapter adapter;
 	
+	Meeting theMeeting;
 
 	Toast mToast;
 	ResultDisplayer mPendingResult;
@@ -76,6 +78,10 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_invitepeople);
 
+		Log.e("asdf",""+getIntent().getExtras().get("theMeeting").getClass());
+		theMeeting = getIntent().getExtras().getParcelable("theMeeting");
+		
+		
 		// Watch for button clicks.
 		Button addPerson = ((Button) findViewById(R.id.addPersonButton));
 		addPerson.setOnClickListener(this);
@@ -97,7 +103,7 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 	
 	  public void onUpload() {
 	    
-	    String readTwitterFeed = readTwitterFeed();
+	    String readTwitterFeed = uploadMeeting();
 	    try {
 	      JSONArray jsonArray = new JSONArray(readTwitterFeed);
 	      Log.i("asdf",
@@ -111,21 +117,17 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 	    }
 	  }
 
-	  public String readTwitterFeed() {
+	  public String uploadMeeting() {
 	    StringBuilder builder = new StringBuilder();
 	    HttpClient client = new DefaultHttpClient();
+	        
 	    
-	    
-	    
-	    
-	    HttpPost httpPost = new HttpPost("http://meetable.io/api/0/meeting/new");//httpGet = new HttpGet("http://meetable.io/api/0/meeting/new");
+	    HttpPost httpPost = new HttpPost("http://meetable.io/api/0/meeting/new");
 	    try {
 	      
 	    	List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-	        nameValuePairs.add(new BasicNameValuePair("data", writeJSON().toString()));
-	        httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-	    	
-	    	
+	        nameValuePairs.add(new BasicNameValuePair("data", theMeeting.toJSON().toString()));
+	        httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));    	
 	    	
 	    	HttpResponse response = client.execute(httpPost);
 	      StatusLine statusLine = response.getStatusLine();
@@ -154,38 +156,6 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 	    }
 	    return builder.toString();
 	  }
-	
-	public JSONObject writeJSON() {
-		  JSONObject object = new JSONObject();
-		  try {
-		    object.put("name", "Jack Hack");
-		    object.put("length", 30);
-		    object.put("start", 1352632469);
-		    object.put("end", 1352635885);
-		    object.put("narrowToOne", false);
-		    
-		    JSONArray jRay = new JSONArray();
-		    JSONObject jUserDemo = new JSONObject();
-		    jUserDemo.put("name", "Jared King");
-		    jUserDemo.put("email", "");
-		    jUserDemo.put("phone", "9186051721");
-		    jRay.put(jUserDemo);
-		    object.put("attendees", jRay );
-		    
-		    JSONObject jCreator = new JSONObject();
-		    jCreator.put("name", "Eric");
-		    jCreator.put("email", "erickuxhausen@gmail.com");
-		    jCreator.put("phone", "");
-		    object.put("creator", jCreator);
-		    
-		    Log.e("asdf", object.toString());
-		    
-		  } catch (JSONException e) {
-		    e.printStackTrace();
-		  }
-		  
-		return object;
-		} 
 	
 	@Override
 	public void onClick(View v) {
@@ -246,15 +216,8 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 						         ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?", 
 						         new String[]{c.getString(SUMMARY_ID_COLUMN_INDEX)}, null);
 						
-						
-						
 					}
 					*/
-					
-					
-					
-					
-				
 					
 					
 					
