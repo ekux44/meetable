@@ -84,7 +84,7 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 		
 		// Watch for button clicks.
 		Button addPerson = ((Button) findViewById(R.id.addPersonButton));
-		addPerson.setOnClickListener(this);
+		addPerson.setOnClickListener(new ResultDisplayer("Selected contact",ContactsContract.Contacts.CONTENT_ITEM_TYPE));
 		Button sendInvities = ((Button) findViewById(R.id.launchInvitesButton));
 		sendInvities.setOnClickListener(this);
 		
@@ -164,7 +164,8 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 			onUpload();
 			break;
 		case R.id.addPersonButton: new ResultDisplayer("Selected contact", ContactsContract.Contacts.CONTENT_ITEM_TYPE);
-			break;
+		
+		break;
 		}
 	}
 
@@ -196,9 +197,7 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 					                  + Data.MIMETYPE + "='" + Phone.CONTENT_ITEM_TYPE + "'",
 					          new String[] {String.valueOf(myId)}, null);
 					
-					
-					
-					
+										
 					
 					if (!c.moveToFirst()) 
 						return;
@@ -214,11 +213,9 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 						         ContactsContract.CommonDataKinds.Phone.CONTENT_URI, 
 						         null, 
 						         ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?", 
-						         new String[]{c.getString(SUMMARY_ID_COLUMN_INDEX)}, null);
-						
+						         new String[]{c.getString(SUMMARY_ID_COLUMN_INDEX)}, null);						
 					}
 					*/
-					
 					
 					
 					/*if (c != null && c.moveToFirst()) {

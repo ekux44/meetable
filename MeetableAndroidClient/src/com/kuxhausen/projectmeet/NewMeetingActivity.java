@@ -5,12 +5,17 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -20,7 +25,9 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 	Button addPeople, setDuration, setTimeStart, setTimeEnd, setDayStart,
 			setDayEnd;
 	RadioGroup contactMethod;
-
+	CheckBox autoSelect;
+	EditText meetingName;
+	
 	Meeting m = new Meeting(); 
 	
 
@@ -52,6 +59,10 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 
 		addPeople = (Button) findViewById(R.id.addPeopleButton);
 		addPeople.setOnClickListener(this);
+		
+		autoSelect = (CheckBox)findViewById(R.id.autoSelect);
+		meetingName = (EditText)findViewById(R.id.meetingNameEditText);
+		contactMethod = (RadioGroup)findViewById(R.id.contactMethodGroup);
 
 		final Calendar c = Calendar.getInstance();
 		m.year = c.get(Calendar.YEAR);
@@ -183,6 +194,20 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.addPeopleButton:
+			
+			TelephonyManager telephonyManager = (TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE);
+
+			m.hostNumber = telephonyManager.getLine1Number();
+			
+			m.meetingName = meetingName.getText().toString();
+			
+			m.autoSelectBestTime = autoSelect.isChecked();
+			
+			if(((RadioButton)contactMethod.getChildAt(1)).isChecked())	
+				m.preferSMS = false;
+			else
+				m.preferSMS = true;
+			
 			Intent i = new Intent(this, InvitePeopleActivity.class);
 			i.putExtra("theMeeting", m);
 			startActivity(i);
