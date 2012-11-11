@@ -1,16 +1,22 @@
 <?php
 
+// Command Line Calls only
+if( php_sapi_name() == 'cli' )
+	chdir(__DIR__);
+		
 DEFINE( 'HOST_NAME', 'hack.nfuseweb.com' );
 ini_set('default_charset', 'utf-8');
 include_once('functions.php');
 
 // autoloader
 spl_autoload_register(function($classname) {
-	if( file_exists( $classname . '.php' ) )
-		include $classname . '.php';
+	$filename = $classname.'.php';
+
+	if( file_exists( $filename ) )
+		include $filename;
 });
 
-$url = $_SERVER['REQUEST_URI'];
+$url = val( $_SERVER, 'REQUEST_URI' );
 $strippedURL = current(explode('?', $url));
 $urlParams = explode('/', $strippedURL);
 
@@ -18,6 +24,13 @@ if( isset( $urlParams[0] ) && $urlParams[0] == '' )
 	unset($urlParams[0]);
 
 Database::initialize();
+
+// process message queues
+if( ( php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR']) ) || urlParam( 1 ) == 'cron' )
+{
+	include 'cron.php';
+	exit;
+}
 
 switch( urlParam( 1 ) )
 {

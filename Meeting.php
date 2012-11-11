@@ -2,6 +2,140 @@
 
 class Meeting
 {
+	private $id;	
+	private $info;
+	private $infoLoaded;
+
+	/**
+	 * Constructor
+	 *
+	 * @param int|string $id List ID
+	 */
+	function __construct($id = -1) {
+		if( is_numeric( $id ) )
+			$this->id = $id;
+		else
+			$this->id = -1;
+	}
+	
+	//////////////////////////////
+	// GETTERS
+	//////////////////////////////
+
+	/**
+	 * Gets the list ID
+	 * @return int ID
+	 */
+	function id() {
+		return $this->id;
+	}
+	
+	/**
+	 * Caches all of the columns from the main List table
+	 * @return bool Indicates if the information was loaded successfully
+	 */
+	function loadInfo()
+	{
+		if( $this->id() == -1 )
+			return false;
+			
+		$info = Database::select(
+			'Meetings',
+			'*',
+			array(
+				'where' => array(
+					'id' => $this->id ),
+				'singleRow' => true ) );
+		
+		foreach( (array)$info as $key => $item )
+			$this->info[ $key ] = $item;
+
+		$this->infoLoaded = true;
+		return true;
+	}
+	
+	/**
+	 * Gets a column from the main List table
+	 * @param $piece Column name
+	 * @return string|null Requested info or not found
+	 */
+	function info( $piece )
+	{
+		if( $this->infoLoaded || isset( $this->info[ $piece ] ) )
+			return (isset( $this->info[ $piece ] )) ? $this->info[ $piece ] : null;
+			
+		$value = Database::select(
+			'Meetings',
+			$piece,
+			array(
+				'where' => array(
+					'id' => $this->id ),
+				'single' => true ) );
+
+		$this->info[ $piece ] = $value;
+
+		return $value;
+	}
+	
+	/**
+	 * Gets the list name
+	 *
+	 * @param boolean $strip_chars true if 
+	 *
+	 * @return string|false Name of the list or error
+	 */
+	function name( $strip_chars = true )
+	{
+		if( $this->permission()->canView(false) )
+			return htmlspecialchars( stripslashes( $this->info( 'name' ) ) );
+	
+		return false;
+	}
+	
+	function attendees()
+	{
+		$attendees = Database::select(
+			'Attendees',
+			'user',
+			array(
+				'where' => array(
+					'meeting' => $this->id,
+					'active' => 1 ),
+				'fetchStyle' => 'singleColumn' ) );
+			
+		$return = array();
+		
+		foreach( $attendees as $attendee )
+		{
+			$user = new User( $attendee );
+			$user->loadInfo();
+			$return[] = $user;
+		}
+		
+		return $return;
+	}
+
+	//////////////////////////////
+	// SETTERS
+	//////////////////////////////
+	
+	function kickOff()
+	{
+		// get all of the attendees
+		$attendees = $this->attendees();
+		
+		// send the initial message to all parties
+		foreach( $attendees as $attendee )
+		{
+			$attendee->message( 'initial-meeting', $this );
+		}
+	}
+	
+	function processResponse( $response, $method, $from )
+	{
+	
+	}
+
 	static function create( $data )
 	{
 		/* validate the input */
@@ -89,16 +223,11 @@ class Meeting
 		$ironmq = new IronMQ();
 		
 		// put the message on the queue
-		$ironmq->postMessage("new-meetings", "new-meeting-$meetingID" );
+		$ironmq->postMessage("new-meetings", array(
+			'body' => json_encode( array(
+				'id' =>  $meetingID,
+				'attempts' => 0 ) ) ) );
 		
 		return true;
-		
-		/*
-		// Get a message
-		$msg = $ironmq->getMessage("meetings");
-		
-		// Delete the message
-		$ironmq->deleteMessage("my_queue", $msg->id);
-		*/
 	}
 }
