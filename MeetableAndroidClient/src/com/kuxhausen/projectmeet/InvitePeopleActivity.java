@@ -1,6 +1,26 @@
 package com.kuxhausen.projectmeet;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
@@ -58,8 +78,9 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 
 		// Watch for button clicks.
 		Button addPerson = ((Button) findViewById(R.id.addPersonButton));
-		addPerson.setOnClickListener(new ResultDisplayer("Selected contact",
-				ContactsContract.Contacts.CONTENT_ITEM_TYPE));
+		addPerson.setOnClickListener(this);
+		Button sendInvities = ((Button) findViewById(R.id.launchInvitesButton));
+		sendInvities.setOnClickListener(this);
 		
 		ArrayList<ContactListItem> aList = new ArrayList<ContactListItem>();
 		ContactListItem a = new ContactListItem();
@@ -72,10 +93,108 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 		addedPeople.setAdapter(adapter);
 	}
 
+	
+	
+	  public void onUpload() {
+	    
+	    String readTwitterFeed = readTwitterFeed();
+	    try {
+	      JSONArray jsonArray = new JSONArray(readTwitterFeed);
+	      Log.i("asdf",
+	          "Number of entries " + jsonArray.length());
+	      for (int i = 0; i < jsonArray.length(); i++) {
+	        JSONObject jsonObject = jsonArray.getJSONObject(i);
+	        Log.i("asdf", jsonObject.getString("text"));
+	      }
+	    } catch (Exception e) {
+	      e.printStackTrace();
+	    }
+	  }
+
+	  public String readTwitterFeed() {
+	    StringBuilder builder = new StringBuilder();
+	    HttpClient client = new DefaultHttpClient();
+	    
+	    
+	    
+	    
+	    HttpPost httpPost = new HttpPost("http://meetable.io/api/0/meeting/new");//httpGet = new HttpGet("http://meetable.io/api/0/meeting/new");
+	    try {
+	      
+	    	List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+	        nameValuePairs.add(new BasicNameValuePair("data", writeJSON().toString()));
+	        httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+	    	
+	    	
+	    	
+	    	HttpResponse response = client.execute(httpPost);
+	      StatusLine statusLine = response.getStatusLine();
+	      int statusCode = statusLine.getStatusCode();
+	      if (statusCode == 200) {
+	    	  
+	    	Log.e("asdf",response.toString());  
+	    	  
+	        HttpEntity entity = response.getEntity();
+	        InputStream content = entity.getContent();
+	        BufferedReader reader = new BufferedReader(new InputStreamReader(content));
+	        String line;
+	        String debugOutput = "";
+	        while ((line = reader.readLine()) != null) {
+	          builder.append(line);
+	          debugOutput += line;
+	        }
+	        Log.e("asdf", debugOutput);
+	      } else {
+	        Log.e("asdf", "Failed to download file");
+	      }
+	    } catch (ClientProtocolException e) {
+	      e.printStackTrace();
+	    } catch (IOException e) {
+	      e.printStackTrace();
+	    }
+	    return builder.toString();
+	  }
+	
+	public JSONObject writeJSON() {
+		  JSONObject object = new JSONObject();
+		  try {
+		    object.put("name", "Jack Hack");
+		    object.put("length", 30);
+		    object.put("start", 1352632469);
+		    object.put("end", 1352635885);
+		    object.put("narrowToOne", false);
+		    
+		    JSONArray jRay = new JSONArray();
+		    JSONObject jUserDemo = new JSONObject();
+		    jUserDemo.put("name", "Jared King");
+		    jUserDemo.put("email", "");
+		    jUserDemo.put("phone", "9186051721");
+		    jRay.put(jUserDemo);
+		    object.put("attendees", jRay );
+		    
+		    JSONObject jCreator = new JSONObject();
+		    jCreator.put("name", "Eric");
+		    jCreator.put("email", "erickuxhausen@gmail.com");
+		    jCreator.put("phone", "");
+		    object.put("creator", jCreator);
+		    
+		    Log.e("asdf", object.toString());
+		    
+		  } catch (JSONException e) {
+		    e.printStackTrace();
+		  }
+		  
+		return object;
+		} 
+	
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
-
+		case R.id.launchInvitesButton:
+			onUpload();
+			break;
+		case R.id.addPersonButton: new ResultDisplayer("Selected contact", ContactsContract.Contacts.CONTENT_ITEM_TYPE);
+			break;
 		}
 	}
 
