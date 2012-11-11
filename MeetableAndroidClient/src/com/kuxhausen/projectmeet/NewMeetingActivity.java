@@ -223,9 +223,11 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 			m.autoSelectBestTime = autoSelect.isChecked();
 			
 			if(((RadioButton)contactMethod.getChildAt(1)).isChecked())	
-				m.preferSMS = true;
-			else
 				m.preferSMS = false;
+			else
+				m.preferSMS = true;
+			
+			//Log.e("wtasdf",m.preferSMS);
 			
 			Intent i = new Intent(this, InvitePeopleActivity.class);
 			i.putExtra("theMeeting", m);

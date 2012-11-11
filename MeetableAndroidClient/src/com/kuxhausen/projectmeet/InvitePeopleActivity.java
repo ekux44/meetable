@@ -283,10 +283,10 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 		        final Person custom = entries.get(position);
 		        if (custom != null) {
 		            holder.item1.setText(custom.name);
-		            if(theMeeting.preferSMS && custom.number.length()>0)
+		           // if(theMeeting.preferSMS)// && custom.number.length()>0)
 		            	holder.item2.setText(custom.number);
-		            else
-		            	holder.item2.setText(custom.email);
+		            //else
+		            //	holder.item2.setText(custom.email);
 		        }
 		        return v;
 		    }
