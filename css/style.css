@@ -1,6 +1,88 @@
+html,body {
+	background: url(http://subtlepatterns.subtlepatterns.netdna-cdn.com/patterns/debut_dark.png);
+	color: #fff;
+	font-family: 'Kite One', sans-serif;
+}
+
+.container {
+	width: 700px;
+	text-align: center;
+	background: rgba( 255, 255, 255, 0.1 );
+	padding: 15px 15px 0;
+	margin: 25px auto 20px;
+	border-radius: 4px;
+	overflow: hidden;
+	border: 1px solid #777;
+	box-shadow: 0 2px 6px rgba(0,0,0,.25);
+}
+
+p {
+	line-height: 2em;
+	text-shadow: 0 1px 1px #000;
+	margin: 20px auto;
+	font-size: 1.2em;
+}
+
+h1 {
+	font-family: 'Oswald', sans-serif;
+	margin: 30px auto 30px;
+	font-size: 4em;
+	padding-bottom: 20px;
+    text-shadow: 0px 1px 1px #4d4d4d;
+	color: #222;
+}
+
+h1 a { color: #222; }
+h1 a:hover { color: #000; text-decoration: none; }
+
+.form-actions {
+	background: none;
+	border-top: none;
+	text-align: right;
+}
+
+.btn-getting-started {
+	font-weight: bold;
+	font-family: sans-serif;
+	height: 40px;
+	line-height: 40px;
+	font-size: 18px;
+	margin: 20px 100px 0 0;
+	padding: 10px 25px;
+	border-radius: 10px;
+	background: rgba(0,0,0,0.25);
+	background-color: #0c0;
+	box-shadow: 0 2px 6px rgba(0,0,0,0.25), inset 0 1px rgba(255,255,255,0.3), inset 0 10px rgba(255,255,255,0.2), inset 0 10px 20px rgba(255,255,255,0.25), inset 0 -15px 30px rgba(0,0,0,0.3);
+}
+
+.btn-getting-started:hover {
+	background-color: #0f0;
+}
+
 .inline { display: inline; }
 .or { display: inline-block; margin-left: 10px; margin-right: 10px; }
 #attendeeLineTemplate { display: none; }
+
+
+.input-append .add-on, .input-prepend .add-on {
+	background: #3a3a3a;
+	text-shadow: none;
+	border: 1px solid #333;
+	padding: inherit 10px;
+}
+
+input.bg, input.input-name, input.input-email, input.input-phone {
+	background: #ffffff; /* Old browsers */
+	background: -moz-linear-gradient(top,  #ffffff 0%, #cccccc 100%) !important; /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#cccccc)) !important; /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #ffffff 0%,#cccccc 100%) !important; /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #ffffff 0%,#cccccc 100%) !important; /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #ffffff 0%,#cccccc 100%) !important; /* IE10+ */
+	background: linear-gradient(to bottom,  #ffffff 0%,#cccccc 100%) !important; /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#cccccc',GradientType=0 ) !important; /* IE6-9 */
+	border: 1px solid #333 !important;
+}
+input.time-picker { border: none !important; }
 
 /* Date selection */
 .date-picker {
@@ -21,10 +103,11 @@ input.time-picker {
 
 #attendees {
 	max-width: 650px;
-	margin: 0 0 20px;
-	background: rgba( 240,240,240, 1);
-	border-radius: 4px;
-	border: 1px solid rgba(200, 200, 200, 1);
+	margin: 0 auto 20px;
+    background: none repeat scroll 0 0 rgba(204, 204, 204, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px 4px 4px 4px;
+    box-shadow: 0 1px 1px 0 rgba(255, 255, 255, 0.3), 0 10px 10px rgba(255, 255, 255, 0.1) inset;
 	overflow: hidden;
 }
 

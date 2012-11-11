@@ -201,8 +201,9 @@ class Meeting
 			'f.start,f.end',
 			array(
 				'where' => array(
-					'a.meeting' => $this->id ) ) );
-		
+					'a.meeting' => $this->id,
+					'a.active' => 1 ) ) );
+
 		foreach( $timeFrames as $frame )
 		{
 			if( $frame[ 'start' ] < $frame[ 'end' ] )
@@ -286,7 +287,10 @@ class Meeting
 			iv) unsolvable
 		*/
 		
+		// get the current time frame
 		$timeRange = $this->getValidTimeFrame();
+		print_pre($timeRange);
+		
 		// if no time range, we are screwed
 		if( !$timeRange )
 		{
@@ -297,19 +301,29 @@ class Meeting
 		{
 			return array( 'status' => 'solved', 'solution' => $timeRange[ 'start' ] );
 		}
-		// everyone has participated and there is a time frame
+		// check if everyone has submitted a time
 		else if( Database::select(
-			'Meetings as m',
+			'Attendees',
 			'count(*)',
 			array(
 				'where' => array(
-					'm.id' => $this->id,
-					'NOT EXISTS (
-						SELECT *
-						FROM Attendees as a JOIN Time_Frame AS f ON f.id = a.time_frame
-						WHERE a.meeting = m.id AND a.creator = 0 )' ),
-				'single' => true ) ) == 0 )
+					'meeting' => $this->id,
+					'creator' => 0,
+					'active' => 1,
+					'time_frame > 0' ),
+				'single' => true ) ) ==
+			Database::select(
+				'Attendees',
+				'count(*)',
+				array(
+					'where' => array(
+						'meeting' => $this->id,
+						'creator' => 0,
+						'active' => 1 ),
+					'single' => true ) ) )
 		{
+			print_pre($timeRange);
+			
 			// automatically pick a solution?
 			if( $this->info( 'narrowToOne' ) == 0 )
 			{
@@ -857,6 +871,8 @@ class Meeting
 			// generate the time range
 			$timeRange = $this->generateTimeRange( $time );
 			
+			// TODO: the current bounds should exclude the user's previous guess
+			
 			// check that we are within the bounds
 			$bounds = $this->getValidTimeFrame();
 
@@ -865,7 +881,7 @@ class Meeting
 				// give the user an error message
 				$user->message( 'bad-time', $this, $method );
 				
-				return true;			
+				return true;
 			}
 						
 			// TODO: this would be more efficient if time ranges were built into the attendee and meeting objects
@@ -936,7 +952,9 @@ class Meeting
 			
 			// confirm the time with everyone
 			foreach( $this->attendees() as $attendee )
+			{
 				$attendee->message( 'solution-found', $this, 'both', date( 'l, F j, Y g:i A', $solution['solution'] ) );
+			}
 			
 			return true;
 		}
@@ -950,9 +968,14 @@ class Meeting
 		// solvable
 		else if( $solution[ 'status' ] == 'solvable' )
 		{
-			// give everyone a status update with the current time window
+			// give everyone a status update with the current time window except the current user
 			foreach( $this->attendees() as $attendee )
+			{
+				if( $attendee->id() == $user->id() )
+					continue;
+			
 				$attendee->message( 'status', $this );
+			}
 			
 			return true;
 		}

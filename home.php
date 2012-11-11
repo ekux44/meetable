@@ -9,7 +9,9 @@
 	<link href="/css/bootstrap-responsive.min.css" type="text/css" rel="stylesheet" />
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" />
 	<link href="/css/style.css" type="text/css" rel="stylesheet" />
-
+	<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Kite+One' rel='stylesheet' type='text/css'>
+	
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="/js/bootstrap.min.js"></script>
@@ -19,7 +21,8 @@
 </head>
 <body>
 <div class="container">
-	<h1>Meetable</h1>
+	<h1><a href="/">Meetable</a></h1>
+	
 	<?php
 		if( $success )
 			echo '<div class="alert alert-success"><strong>Woo hoo!</strong> Your meeting has been created and each attendee will be contacted shortly to request a time. We will keep you updated.</div>';
@@ -28,39 +31,39 @@
 	?>
 	<form action="/new" method="post">
 		<p>
-			<label>What is the name of this meeting?</label>
+			<h3>What is this meeting about?</h3>
 			<input type="text" name="name" value="<?php echo $data['name'];?>" />
 		</p>
 		<p>
-			<label>How long will the meeting last?</label>
+			<h3>For how long?</h3>
 			<div class="input-append">
 				<input class="span1" type="text" name="length" value="<?php echo $data['length'];?>" />
 				<span class="add-on">minutes</span>
 			</div>
 		</p>
 		<p>
-			<label>What is the time frame you want to schedule this meeting in?</label>
-			<label>Start</label>
-			<input type="text" name="start-date" value="<?php echo $data['timeRange']['start-date'];?>" class="date-picker" />
-			<input type="text" name="start-time" value="<?php echo $data['timeRange']['start-time'];?>" class="time-picker" />
-			<label>End</label>
-			<input type="text" name="end-date" value="<?php echo $data['timeRange']['end-date'];?>" class="date-picker" />
-			<input type="text" name="end-time" value="<?php echo $data['timeRange']['end-time'];?>" class="time-picker" />
+			<h3>When?</h3>
 		</p>
+		<label class="inline or">Start</label>
+		<input type="text" name="start-date" value="<?php echo $data['timeRange']['start-date'];?>" class="date-picker" />
+		<input type="text" name="start-time" value="<?php echo $data['timeRange']['start-time'];?>" class="time-picker" />
+		<label class="inline or">End</label>
+		<input type="text" name="end-date" value="<?php echo $data['timeRange']['end-date'];?>" class="date-picker" />
+		<input type="text" name="end-time" value="<?php echo $data['timeRange']['end-time'];?>" class="time-picker" />
 		<p>
-			<label>Who is invited?</label>
+			<h3>Who?</h3>
 		</p>
 		<div id="attendees">
 			<?php foreach( (array)$data[ 'attendeeNames' ] as $k => $name ) { ?>
 				<div class="line clearfix not-new">
 					<div class="line-name">
 						<a href="#" class="deleteLine pull-left"><i class="icon icon-remove"></i></a>
-						<input class="input-medium input-name inline" type="text" name="attendeeNames[]" value="<?php echo $data[ 'attendeeNames' ][ $k ]; ?>" placeholder="Name" />
+						<input class="input-medium input-name inline" type="text" name="attendeeNames[]" value="<?php echo $data[ 'attendeeNames' ][ $k ]; ?>" />
 					</div>
 					<div class="line-email">
 						<div class="input-prepend inline">
 							<span class="add-on">e-mail</span>
-							<input class="input-email" type="text" name="attendeeEmails[]" value="<?php echo $data[ 'attendeeEmails' ][ $k ]; ?>" placeholder="E-mail Address" />
+							<input class="input-email" type="text" name="attendeeEmails[]" value="<?php echo $data[ 'attendeeEmails' ][ $k ]; ?>" />
 						</div>
 					</div>
 					<div class="line-or">or</div>
@@ -93,10 +96,12 @@
 			</div>			
 		</div>
 		<p>
-			<label>What is your name?</label>
-			<input type="text" name="creatorName" class="input-name" value="<?php echo $data['creatorName'];?>" />
+			<h3>Who is this from?</h3>
+			<p>	
+				<label class="inline">Name</label>
+				<input type="text" name="creatorName" class="input-name" value="<?php echo $data['creatorName'];?>" />
+			</p>
 			
-			<label>How can we contact you?</label>
 			<div class="input-prepend inline">
 				<span class="add-on">e-mail</span>
 				<input class="input-email" type="text" name="creatorEmail" value="<?php echo $data['creatorEmail'];?>" />
@@ -108,15 +113,11 @@
 			</div>
 		</p>
 		<p>
-			<label>Do you want us to find an exact time everyone agrees on or randomly pick a time in the acceptable range of times?</label>
-			<div class="btn-group" data-toggle-name="narrowToOne" data-toggle="buttons-radio">
-			  <button type="button" value="0" class="btn" data-toggle="button">Random</button>
-			  <button type="button" value="1" class="btn" data-toggle="button">Exact</button>
-			</div>
-			<input type="hidden" name="narrowToOne" value="<?php echo $data['narrowToOne'];?>" />
+			<label class="inline">Do you want to have the last say in the meeting times if it comes down to a tie? If you leave this unchecked, we will break ties for you.</label>
+			<input type="checkbox" value="<?php echo $data['narrowToOne']; ?>" class="inline" name="narrowToOne" />
 		</p>
 		<div class="form-actions">
-			<input type="submit" name="Submit" value="Create!" class="btn btn-success btn-large" />
+			<input type="submit" name="Submit" value="Create!" class="btn btn-success btn-large btn-getting-started" />
 		</div>
 	</form>	
 </div>
