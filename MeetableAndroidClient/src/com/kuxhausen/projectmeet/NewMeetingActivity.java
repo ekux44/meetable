@@ -17,11 +17,12 @@ import android.widget.TimePicker;
 
 public class NewMeetingActivity extends Activity implements OnClickListener {
 
-	Button addPeople, setDuration, setTimeStart, setTimeEnd, setDayStart, setDayEnd;
+	Button addPeople, setDuration, setTimeStart, setTimeEnd, setDayStart,
+			setDayEnd;
 	RadioGroup contactMethod;
 
 	int duration = 60;
-	
+
 	// date and time
 	private int mYear;
 	private int mMonth;
@@ -45,19 +46,19 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 
 		setDuration = (Button) findViewById(R.id.durationButton);
 		setDuration.setOnClickListener(this);
-		
+
 		setTimeStart = (Button) findViewById(R.id.startTimeButton);
 		setTimeStart.setOnClickListener(this);
-		
+
 		setTimeEnd = (Button) findViewById(R.id.stopTimeButton);
 		setTimeEnd.setOnClickListener(this);
-		
+
 		setDayStart = (Button) findViewById(R.id.startDayButton);
 		setDayStart.setOnClickListener(this);
-		
+
 		setDayEnd = (Button) findViewById(R.id.stopDayButton);
 		setDayEnd.setOnClickListener(this);
-		
+
 		addPeople = (Button) findViewById(R.id.addPeopleButton);
 		addPeople.setOnClickListener(this);
 
@@ -67,9 +68,9 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 		mStartDay = c.get(Calendar.DAY_OF_MONTH);
 		mStartHour = c.get(Calendar.HOUR_OF_DAY);
 		mStartMinute = c.get(Calendar.MINUTE);
-		
-		mStopHour = mStartHour + duration/60;
-		mStopMinute= mStartMinute + duration%60;
+
+		mStopHour = mStartHour + duration / 60;
+		mStopMinute = mStartMinute + duration % 60;
 		mStopDay = mStartDay;
 
 		updateDisplay();
@@ -79,20 +80,20 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
 		case DURATION_DIALOG_ID:
-			return new TimePickerDialog(this, mDurationSetListener, duration/60, duration%60,
-					true);
+			return new TimePickerDialog(this, mDurationSetListener,
+					duration / 60, duration % 60, true);
 		case START_TIME_DIALOG_ID:
-			return new TimePickerDialog(this, mStartTimeSetListener, mStartHour, mStartMinute,
-					false);
+			return new TimePickerDialog(this, mStartTimeSetListener,
+					mStartHour, mStartMinute, false);
 		case STOP_TIME_DIALOG_ID:
-			return new TimePickerDialog(this, mStopTimeSetListener, mStopHour, mStopMinute,
-					false);
+			return new TimePickerDialog(this, mStopTimeSetListener, mStopHour,
+					mStopMinute, false);
 		case START_DATE_DIALOG_ID:
-			return new DatePickerDialog(this, mStartDateSetListener, mYear, mMonth,
-					mStartDay);
+			return new DatePickerDialog(this, mStartDateSetListener, mYear,
+					mMonth, mStartDay);
 		case STOP_DATE_DIALOG_ID:
-			return new DatePickerDialog(this, mStopDateSetListener, mYear, mMonth,
-				mStopDay);
+			return new DatePickerDialog(this, mStopDateSetListener, mYear,
+					mMonth, mStopDay);
 		}
 		return null;
 	}
@@ -101,14 +102,15 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 	protected void onPrepareDialog(int id, Dialog dialog, Bundle args) {
 		switch (id) {
 		case DURATION_DIALOG_ID:
-			((TimePickerDialog) dialog).updateTime(duration/60, duration%60);
+			((TimePickerDialog) dialog)
+					.updateTime(duration / 60, duration % 60);
 			break;
 		case START_TIME_DIALOG_ID:
 			((TimePickerDialog) dialog).updateTime(mStartHour, mStopMinute);
 			break;
 		case STOP_TIME_DIALOG_ID:
 			((TimePickerDialog) dialog).updateTime(mStopHour, mStopMinute);
-			break;	
+			break;
 		case START_DATE_DIALOG_ID:
 			((DatePickerDialog) dialog).updateDate(mYear, mMonth, mStartDay);
 			break;
@@ -119,22 +121,23 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 	}
 
 	private void updateDisplay() {
-		setDuration.setText("Event length : " + (duration/60)+":"+pad(duration%60));
-		setTimeStart.setText(""+pad(mStartHour)+":"+pad(mStartMinute));
-		setTimeEnd.setText(""+pad(mStopHour)+":"+pad(mStopMinute));
+		setDuration.setText("Event length : " + (duration / 60) + ":"
+				+ pad(duration % 60));
+		setTimeStart.setText("" + pad(mStartHour) + ":" + pad(mStartMinute));
+		setTimeEnd.setText("" + pad(mStopHour) + ":" + pad(mStopMinute));
 		setDayStart.setText(new StringBuilder()
-		// Month is 0 based so add 1
-		.append(mMonth + 1).append("-").append(mStartDay).append("-")
-		.append(mYear).append(" "));
+				// Month is 0 based so add 1
+				.append(mMonth + 1).append("-").append(mStartDay).append("-")
+				.append(mYear).append(" "));
 		setDayEnd.setText(new StringBuilder()
-		// Month is 0 based so add 1
-		.append(mMonth + 1).append("-").append(mStopDay).append("-")
-		.append(mYear).append(" "));
-				
+				// Month is 0 based so add 1
+				.append(mMonth + 1).append("-").append(mStopDay).append("-")
+				.append(mYear).append(" "));
+
 	}
 
 	private DatePickerDialog.OnDateSetListener mStartDateSetListener = new DatePickerDialog.OnDateSetListener() {
-		
+
 		public void onDateSet(DatePicker view, int year, int monthOfYear,
 				int dayOfMonth) {
 			mYear = year;
@@ -143,8 +146,8 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 			updateDisplay();
 		}
 	};
-private DatePickerDialog.OnDateSetListener mStopDateSetListener = new DatePickerDialog.OnDateSetListener() {
-		
+	private DatePickerDialog.OnDateSetListener mStopDateSetListener = new DatePickerDialog.OnDateSetListener() {
+
 		public void onDateSet(DatePicker view, int year, int monthOfYear,
 				int dayOfMonth) {
 			mYear = year;
@@ -157,7 +160,7 @@ private DatePickerDialog.OnDateSetListener mStopDateSetListener = new DatePicker
 	private TimePickerDialog.OnTimeSetListener mDurationSetListener = new TimePickerDialog.OnTimeSetListener() {
 
 		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-			duration = hourOfDay*60 + minute;
+			duration = hourOfDay * 60 + minute;
 			updateDisplay();
 		}
 	};
