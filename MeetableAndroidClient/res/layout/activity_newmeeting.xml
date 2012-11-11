@@ -20,9 +20,9 @@
                 android:layout_height="wrap_content"
                 android:text="@string/event_name_prompt"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
             <EditText
-                android:id="@+id/editText1"
+                android:id="@+id/meetingNameEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -121,12 +121,13 @@
                     android:layout_height="wrap_content"
                     android:text="@string/email_option" />
             </RadioGroup>
-
+
             <CheckBox
-                android:id="@+id/checkBox1"
+                android:id="@+id/autoSelect"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="CheckBox" />
+                android:checked="@bool/auto_select"
+                android:text="@string/auto_select" />
 
             <Button
                 android:id="@+id/addPeopleButton"

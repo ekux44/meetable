@@ -15,4 +15,5 @@
     <string name="stop_time">Latest possible end :</string>
     <string name="add_person">Add Person</string>
     <string name="launch_invites">Send</string>
+    <string name="auto_select">Automatically choose meeting time when multiple times possible</string>
 </resources>
