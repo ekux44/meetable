@@ -16,4 +16,5 @@
     <string name="add_person">Add Person</string>
     <string name="launch_invites">Send</string>
     <string name="auto_select">Automatically choose meeting time when multiple times possible</string>
+    <string name="host_name_prompt">Your Name</string>
 </resources>

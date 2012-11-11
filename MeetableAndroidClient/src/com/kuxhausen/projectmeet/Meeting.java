@@ -1,5 +1,6 @@
 package com.kuxhausen.projectmeet;
 
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
 import org.json.JSONArray;
@@ -14,38 +15,43 @@ import android.util.Log;
 public class Meeting implements Parcelable{
 
 	
-	int duration, startMinute, stopMinute, startHour, stopHour, startDay, stopDay, month, year;
+	int duration=60, startMinute, stopMinute, startHour, stopHour, startDay, stopDay, month, year;
 	
 	Boolean preferSMS, autoSelectBestTime;
 	
-	String meetingName, hostName, hostEmail, hostNumber;
+	String meetingName="", hostName="", hostEmail="", hostNumber="";
 	
 	
-	public JSONObject toJSON(){
+	public JSONObject toJSON(ArrayList<Person> pList){
 		JSONObject object = new JSONObject();
 		  try {
 		    object.put("name", meetingName);
 		    object.put("length", duration);
+		    
 		    GregorianCalendar startCal = new GregorianCalendar();
 		    startCal.set(year, month, startDay, startHour, startMinute, 0);
 		    object.put("start", startCal.getTimeInMillis()/1000);
 		    GregorianCalendar stopCal = new GregorianCalendar();
 		    stopCal.set(year, month, stopDay, stopHour, stopMinute, 0);
 		    object.put("end",  stopCal.getTimeInMillis()/1000);
+		    
 		    object.put("narrowToOne", autoSelectBestTime);
 		    
 		    JSONArray jRay = new JSONArray();
+		    for(Person pers : pList)
+		    {
 		    JSONObject jUserDemo = new JSONObject();
-		    jUserDemo.put("name", "Jared King");
-		    jUserDemo.put("email", "");
-		    jUserDemo.put("phone", "9186051721");
+			jUserDemo.put("name", pers.name);
+		    jUserDemo.put("email",(pers.email==null) ? "" : pers.email);
+		    jUserDemo.put("phone",pers.number);
 		    jRay.put(jUserDemo);
+		    }
 		    object.put("attendees", jRay );
 		    
 		    JSONObject jCreator = new JSONObject();
-		    jCreator.put("name", "Eric K");//hostName);
-		    jCreator.put("email", "");//hostEmail);
-		    jCreator.put("phone", "8325527666");//hostNumber);
+		    jCreator.put("name", hostName);
+		    jCreator.put("email", hostEmail);
+		    jCreator.put("phone", hostNumber);
 		    object.put("creator", jCreator);
 		    
 		  } catch (JSONException e) {

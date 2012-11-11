@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+<LinearLayout android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical" xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ScrollView
         android:id="@+id/scrollView1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
-
+
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -20,34 +21,59 @@
                 android:layout_height="wrap_content"
                 android:text="@string/event_name_prompt"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
+
             <EditText
                 android:id="@+id/meetingNameEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:ems="10" />
-
+
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/host_name_prompt"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+
+            <EditText
+                android:id="@+id/hostName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10" >
+
+                <requestFocus />
+            </EditText>
+
+
+
+
+
+
+
             <Button
                 android:id="@+id/durationButton"
                 style="?android:attr/buttonStyleSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:text="@string/invisible" />
-
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/start_time"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp" >
-
-                <TextView
-                    android:id="@+id/textView2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/start_time"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
-
+                android:layout_height="wrap_content" >
+
                 <Button
                     android:id="@+id/startTimeButton"
                     style="?android:attr/buttonStyleSmall"
@@ -55,7 +81,11 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:text="@string/invisible" />
-
+
+
+
+
+
                 <Button
                     android:id="@+id/startDayButton"
                     style="?android:attr/buttonStyleSmall"
@@ -65,20 +95,19 @@
                     android:text="@string/invisible" />
 
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/stop_time"
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp" >
-
-                <TextView
-                    android:id="@+id/textView5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/stop_time"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
-
+                android:layout_height="wrap_content" >
+
                 <Button
                     android:id="@+id/stopTimeButton"
                     style="?android:attr/buttonStyleSmall"
@@ -86,7 +115,12 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:text="@string/invisible" />
-
+
+
+
+
+
+
                 <Button
                     android:id="@+id/stopDayButton"
                     style="?android:attr/buttonStyleSmall"
@@ -102,7 +136,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/prefered_contact_prompt" />
-
+
+
             <RadioGroup
                 android:id="@+id/contactMethodGroup"
                 android:layout_width="wrap_content"
@@ -121,14 +156,18 @@
                     android:layout_height="wrap_content"
                     android:text="@string/email_option" />
             </RadioGroup>
-
+
+
+
+
             <CheckBox
                 android:id="@+id/autoSelect"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="@bool/auto_select"
                 android:text="@string/auto_select" />
-
+
+
             <Button
                 android:id="@+id/addPeopleButton"
                 android:layout_width="wrap_content"

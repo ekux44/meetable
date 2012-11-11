@@ -1,6 +1,10 @@
 package com.kuxhausen.projectmeet;
 
 import java.util.Calendar;
+import java.util.regex.Pattern;
+
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -9,6 +13,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -27,6 +33,7 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 	RadioGroup contactMethod;
 	CheckBox autoSelect;
 	EditText meetingName;
+	EditText hostName;
 	
 	Meeting m = new Meeting(); 
 	
@@ -62,17 +69,18 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 		
 		autoSelect = (CheckBox)findViewById(R.id.autoSelect);
 		meetingName = (EditText)findViewById(R.id.meetingNameEditText);
+		hostName = (EditText)findViewById(R.id.meetingNameEditText);
 		contactMethod = (RadioGroup)findViewById(R.id.contactMethodGroup);
 
 		final Calendar c = Calendar.getInstance();
 		m.year = c.get(Calendar.YEAR);
 		m.month = c.get(Calendar.MONTH);
 		m.startDay = c.get(Calendar.DAY_OF_MONTH);
-		m.startHour = c.get(Calendar.HOUR_OF_DAY);
+		m.startHour = 1+c.get(Calendar.HOUR_OF_DAY);
 		m.startMinute = c.get(Calendar.MINUTE);
 
 		m.stopHour = m.startHour + m.duration / 60;
-		m.stopMinute = m.startMinute + m.duration % 60;
+		m.stopMinute = m.startMinute + + m.duration % 60;
 		m.stopDay = m.startDay;
 
 		updateDisplay();
@@ -195,11 +203,22 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 		switch (v.getId()) {
 		case R.id.addPeopleButton:
 			
+			Pattern emailPattern = Patterns.EMAIL_ADDRESS; // API level 8+
+			Account[] accounts = AccountManager.get(this).getAccounts();
+			loop : for (Account account : accounts) {
+			    if (emailPattern.matcher(account.name).matches()) {
+			        m.hostEmail = account.name;
+			        break loop;
+			    }
+			} 
+			
+		    
+			
 			TelephonyManager telephonyManager = (TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE);
-
 			m.hostNumber = telephonyManager.getLine1Number();
 			
 			m.meetingName = meetingName.getText().toString();
+			m.hostName = hostName.getText().toString();
 			
 			m.autoSelectBestTime = autoSelect.isChecked();
 			
@@ -207,6 +226,8 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 				m.preferSMS = false;
 			else
 				m.preferSMS = true;
+			
+			//Log.e("wtasdf",m.preferSMS);
 			
 			Intent i = new Intent(this, InvitePeopleActivity.class);
 			i.putExtra("theMeeting", m);
