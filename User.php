@@ -10,7 +10,11 @@ class User
 		'19185746923' );
 	
 	private static $ourEmailAddresses = array(
-		'test@test.com' );
+		'reply1@meetup.io',
+		'reply2@meetup.io',
+		'reply3@meetup.io',
+		'reply4@meetup.io',
+		'reply5@meetup.io' );
 
 	private $id;	
 	private $info;
@@ -123,6 +127,7 @@ class User
 			$fromField = 'smsFrom';
 		} elseif( $type == 'email' )
 		{
+			// our e-mail addresses
 			$valid = self::$ourEmailAddresses;
 			
 			$fromField = 'emailFrom';
@@ -142,8 +147,31 @@ class User
 			return $from;
 		
 		// choose a valid unused candidate
-		// TODO
 		$from = reset( $valid );
+		
+		foreach( $valid as $f )
+		{	
+			// check that the address is not in use by the attendee with:
+			// i) unsolved meeting
+			// ii) unexpired meeting
+			if( Database::select(
+				'Attendees AS a1',
+				'count(*)',
+				array(
+					'where' => array(
+						'a1.user' => $this->id,
+						"a1.$fromField" => $f,
+						"NOT EXISTS (
+							SELECT *
+							FROM Attendees AS a2 JOIN Meetings as m ON a2.meeting = m.id JOIN Time_Frame as t ON m.time_frame = t.id
+							WHERE meeting.status <> 0 OR t.end <= '" . time() . "' AND a2.user = a1.user )"
+					),
+					'single' => true ) ) == 1 )
+			{
+				$from = $f;
+				break;
+			}
+		}
 		
 		// save for the future
 		Database::update(
@@ -164,7 +192,7 @@ class User
 	static function create( $name, $phone, $email )
 	{
 		// check if the user already exists
-		if( $uid = Database::select(
+		$uid = $uid = Database::select(
 			'Users',
 			'id',
 			array(
@@ -172,7 +200,8 @@ class User
 					'name' => $name,
 					'phone' => $phone,
 					'email' => $email ),
-				'single' => true ) ) )
+				'single' => true ) );
+		if( $uid > 0 )
 			return $uid;
 			
 		if( Database::insert(
@@ -195,43 +224,98 @@ class User
 	 * Sends the user a message about a meeting
 	 *
 	 */
-	function message( $messageID, $meeting )
+	function message( $messageID, $meeting, $method = 'both' )
 	{
 		// get all of the contact methods for the user
 		$phone = $this->info( 'phone' );
 		$email = $this->info( 'email' );
 		
-		if( $phone )
-		{			
+		$creatorName = $meeting->creator()->name();
+		$userName = $this->name();
+		$meetingName = $meeting->name();
+		$meetingRange = $meeting->getValidTimeFrame(true);
+		$meetingLength = $meeting->meetingLength( true );
+		$userRange = $user->getUserTimeFrame( $this, true );
+		
+		if( $phone && in_array( $method, array( 'both', 'phone' ) ) )
+		{
 			// get a phone number to contact this user from
 			$from = $this->getUniqueFrom( $meeting, 'phone' );
 			
 			// generate the message
-			include_once 'messages.php';
 			$message = str_replace(
-				array( '{CREATOR_NAME}', '{USER_NAME}', '{MEETING_NAME}' ),
-				array( $meeting->creator()->name(), $this->name(), $meeting->name() ),
-				$smsMessages[ $messageID ] );
+				array( '{CREATOR_NAME}', '{USER_NAME}', '{MEETING_NAME}', '{MEETING_RANGE}', '{MEETING_LENGTH}', '{USER_RANGE}' ),
+				array( $creatorName, $userName, $meetingName, $meetingRange, $meetingLength, $userRange ),
+				MeetableMessages::$smsMessages[ $messageID ] );
 			
 			echo 'Sending ' . $this->name() . " a text message for $messageID from $from<br />";
 			
+			// break up message if > 160 characters
+			$messages = array( $message );
+			
+			if( strlen( $message ) > 160 )
+			{
+				// break up into messages of 150 characters + (page/total pages)
+			    /// lets use 152 characters and keep room for message number like (1/10),
+			    /// we can have upto 99 parts of the message (99/99)
+			
+			    $messagesSplit = str_split($message , 152); 
+			    $how_many = count($messagesSplit);
+			    $messages = array();
+			    foreach($messagesSplit as $index => $m)
+			        $messages[] = "(".($index+1)."/".$how_many.") ".$m;
+			}
+			
 			// instantiate a new Twilio Rest Client
-			require 'Twilio.php';
+			require_once 'Twilio.php';
 			$client = new Services_Twilio( 'ACef536c27dac7efda7fe758844e6665ef', 'dd5ca9994edbb122adcd294c81c8524a' );
 			
-			// send the message
-			$sms = $client->account->sms_messages->create(
-				$from, // from phone number (ours)
-				$phone, // the number we are sending to (theirs)
-				$message // the sms body
-			);
+			foreach( $messages as $message )
+			{
+				// send the message
+				$sms = $client->account->sms_messages->create(
+					$from, // from phone number (ours)
+					$phone, // the number we are sending to (theirs)
+					$message // the sms body
+				);
+			}
 		}
 		
-		if( $email )
+		if( $email && in_array( $method, array( 'both', 'email' ) ) )
 		{
+			// get a phone number to contact this user from
+			$from = $this->getUniqueFrom( $meeting, 'email' );
+			
+			// generate the message
+			$message = str_replace(
+				array( '{CREATOR_NAME}', '{USER_NAME}', '{MEETING_NAME}', '{MEETING_RANGE}', '{MEETING_LENGTH}', '{USER_RANGE}' ),
+				array( $creatorName, $userName, $meetingName, $meetingRange, $meetingLength, $userRange ),
+				MeetableMessages::$emailMessages[ $messageID ] );
+			
 			echo 'Sending ' . $this->name() . ' an e-mail for ' . $messageID . '<br />';
-		
-		
+			
+			// instantiate PHPMailer
+			$mail = new Mail;
+			
+			// basic e-mail info
+			$mail->From = $from;
+			$mail->FromName = $meeting->creator()->name();
+			$mail->Subject = str_replace(
+				array( '{CREATOR_NAME}', '{USER_NAME}', '{MEETING_NAME}', '{MEETING_RANGE}', '{MEETING_LENGTH}', '{USER_RANGE}' ),
+				array( $creatorName, $userName, $meetingName, $meetingRange, $meetingLength, $userRange ),
+				MeetableMessages::$emailSubjects[ $messageID ] );
+			
+			// text body
+			$mail->AltBody = $message;
+			
+			// html body
+			$mail->MsgHTML( nl2br($message) );
+			
+			// send it to the user
+			$mail->AddAddress( $email );
+			
+			// send the e-mail
+			return $mail->Send();
 		}
 	}
 }

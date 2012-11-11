@@ -20,6 +20,12 @@
 <body>
 <div class="container">
 	<h1>Meetable</h1>
+	<?php
+		if( $success )
+			echo '<div class="alert alert-success"><strong>Woo hoo!</strong> Your meeting has been created and each attendee will be contacted shortly to requesting a time. We will keep you updated.</div>';
+		else if( $error )
+			echo '<div class="alert alert-error">' . $error . '</div>';
+	?>
 	<form action="/new" method="post">
 		<p>
 			<label>What is the name of this meeting?</label>

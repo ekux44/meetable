@@ -28,10 +28,10 @@ foreach( (array)$newMeetingQueue as $message )
 	
 	print_pre($meeting->name());
 	
-	if( $meeting->kickOff() )
+	if( !$meeting->active() || $meeting->kickOff() )
 	{
 		// delete the message
-		//$ironmq->deleteMessage( 'new-meetings', $message->id);
+		$ironmq->deleteMessage( 'new-meetings', $message->id);
 	}
 }
 
@@ -54,10 +54,10 @@ foreach( (array)$responseQueue as $message )
 	$meeting->loadInfo();
 	$user->loadInfo();
 
-	if( $meeting->processResponse( val( $response, 'response' ), $user ) )
+	if( !$meeting->active() || $meeting->processResponse( val( $response, 'response' ), $user, val( $response, 'method' ) ) )
 	{
 		// delete the message
-		//$ironmq->deleteMessage( 'responses', $message->id );
+		$ironmq->deleteMessage( 'responses', $message->id );
 	}
 }
 

@@ -2,6 +2,14 @@ Options +FollowSymlinks
 RewriteEngine On
 RewriteBase /
 
+#redirect all pages to root
+RewriteCond %{THE_REQUEST} "GET /index.php HTTP/1.1"
+RewriteRule index\.php http://meetable.io/ [R=301,L]
+
+#redirect all pages to the non-www version
+RewriteCond %{HTTP_HOST} !^meetable\.io$ [NC]
+RewriteRule ^(.*)$ http://meetable.io/$1 [R=301,L]
+
 # safe include directories
 RewriteRule ^js/(.*)$ js/$1 [L]
 RewriteRule ^css/(.*)$ css/$1 [L]
