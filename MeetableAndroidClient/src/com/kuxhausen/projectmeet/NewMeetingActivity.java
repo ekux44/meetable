@@ -189,7 +189,7 @@ private DatePickerDialog.OnDateSetListener mStopDateSetListener = new DatePicker
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.addPeopleButton:
-			startActivity(new Intent(this, MainActivity.class));
+			startActivity(new Intent(this, InvitePeopleActivity.class));
 			break;
 		case R.id.durationButton:
 			showDialog(DURATION_DIALOG_ID, null);
