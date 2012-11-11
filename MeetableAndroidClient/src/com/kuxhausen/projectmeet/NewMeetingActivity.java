@@ -33,6 +33,7 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 	RadioGroup contactMethod;
 	CheckBox autoSelect;
 	EditText meetingName;
+	EditText hostName;
 	
 	Meeting m = new Meeting(); 
 	
@@ -68,17 +69,18 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 		
 		autoSelect = (CheckBox)findViewById(R.id.autoSelect);
 		meetingName = (EditText)findViewById(R.id.meetingNameEditText);
+		hostName = (EditText)findViewById(R.id.meetingNameEditText);
 		contactMethod = (RadioGroup)findViewById(R.id.contactMethodGroup);
 
 		final Calendar c = Calendar.getInstance();
 		m.year = c.get(Calendar.YEAR);
 		m.month = c.get(Calendar.MONTH);
 		m.startDay = c.get(Calendar.DAY_OF_MONTH);
-		m.startHour = c.get(Calendar.HOUR_OF_DAY);
+		m.startHour = 1+c.get(Calendar.HOUR_OF_DAY);
 		m.startMinute = c.get(Calendar.MINUTE);
 
 		m.stopHour = m.startHour + m.duration / 60;
-		m.stopMinute = m.startMinute + m.duration % 60;
+		m.stopMinute = m.startMinute + + m.duration % 60;
 		m.stopDay = m.startDay;
 
 		updateDisplay();
@@ -216,6 +218,7 @@ public class NewMeetingActivity extends Activity implements OnClickListener {
 			m.hostNumber = telephonyManager.getLine1Number();
 			
 			m.meetingName = meetingName.getText().toString();
+			m.hostName = hostName.getText().toString();
 			
 			m.autoSelectBestTime = autoSelect.isChecked();
 			

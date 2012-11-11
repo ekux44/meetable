@@ -103,7 +103,7 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 	  public void onUpload() {
 	    
 	    String readTwitterFeed = uploadMeeting();
-	    try {
+	    /*try {
 	      JSONArray jsonArray = new JSONArray(readTwitterFeed);
 	      Log.i("asdf",
 	          "Number of entries " + jsonArray.length());
@@ -113,7 +113,7 @@ public class InvitePeopleActivity extends Activity implements OnClickListener {
 	      }
 	    } catch (Exception e) {
 	      e.printStackTrace();
-	    }
+	    }*/
 	  }
 
 	  public String uploadMeeting() {

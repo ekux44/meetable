@@ -19,7 +19,7 @@ public class Meeting implements Parcelable{
 	
 	Boolean preferSMS, autoSelectBestTime;
 	
-	String meetingName, hostName, hostEmail, hostNumber;
+	String meetingName="", hostName="", hostEmail="", hostNumber="";
 	
 	
 	public JSONObject toJSON(ArrayList<Person> pList){
@@ -42,7 +42,7 @@ public class Meeting implements Parcelable{
 		    {
 		    JSONObject jUserDemo = new JSONObject();
 			jUserDemo.put("name", pers.name);
-		    jUserDemo.put("email",pers.email);
+		    jUserDemo.put("email",(pers.email==null) ? "" : pers.email);
 		    jUserDemo.put("phone",pers.number);
 		    jRay.put(jUserDemo);
 		    }
