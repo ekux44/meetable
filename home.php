@@ -3,6 +3,8 @@
 <head>
 	<title>Meetable</title>
 	
+	<meta name="description" value="Schedule meetings and appointments with anyone using SMS and e-mail." />
+	
 	<link rel="shortcut icon" href="/img/favicon.ico" />
 	
 	<link href="/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
@@ -30,6 +32,9 @@
 			echo '<div class="alert alert-error">' . $error . '</div>';
 	?>
 	<form action="/new" method="post">
+		<p class="lead">
+			Meetable is your personal assistant for coordinating meetings. It announce events and finds times when everyone is able to attend. Meetable mobile integrates with your address-book to offer convenient social coordination for your daily life.
+		</p>
 		<p>
 			<h3>What is this meeting about?</h3>
 			<input type="text" name="name" value="<?php echo $data['name'];?>" />
@@ -70,7 +75,7 @@
 					<div class="line-phone">
 						<div class="input-prepend inline">
 							<span class="add-on">phone</span>
-							<input class="input-phone" type="text" name="attendeePhones[]" value="<?php echo $data[ 'attendeePhones' ][ $k ]; ?>" placeholder="Phone Number" />
+							<input class="input-phone" type="text" name="attendeePhones[]" value="<?php echo $data[ 'attendeePhones' ][ $k ]; ?>" />
 						</div>
 					</div>
 				</div>

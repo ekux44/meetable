@@ -249,6 +249,13 @@ AND a1.user = 33
 		$meetingRange = $meeting->getValidTimeFrame(true);
 		$meetingLength = $meeting->meetingLength( true );
 		$userRange = $meeting->getUserTimeFrame( $this, true );
+		$attendees = $meeting->attendees();
+		global $reply;
+		$attNames = array();
+		foreach( $attendees as $a )
+			$attNames[] = $a->name();
+		
+		$attendeeNames = implode( ',', $attNames );
 		
 		if( $phone && in_array( $method, array( 'both', 'phone' ) ) )
 		{
@@ -264,8 +271,8 @@ AND a1.user = 33
 			
 			// generate the message
 			$message = str_replace(
-				array( '{CREATOR_NAME}', '{USER_NAME}', '{MEETING_NAME}', '{MEETING_RANGE}', '{MEETING_LENGTH}', '{USER_RANGE}', '{SOLUTION}' ),
-				array( $creatorName, $userName, $meetingName, $meetingRange, $meetingLength, $userRange, $solution ),
+				array( '{CREATOR_NAME}', '{USER_NAME}', '{MEETING_NAME}', '{MEETING_RANGE}', '{MEETING_LENGTH}', '{USER_RANGE}', '{SOLUTION}', '{ATTENDEE_NAMES}' ),
+				array( $creatorName, $userName, $meetingName, $meetingRange, $meetingLength, $userRange, $solution, $attendeeNames ),
 				MeetableMessages::$smsMessages[ $messageID ] );
 			
 			echo 'Sending ' . $this->name() . " a text message for $messageID from $from<br />";
@@ -315,8 +322,8 @@ AND a1.user = 33
 			
 			// generate the message
 			$message = str_replace(
-				array( '{CREATOR_NAME}', '{USER_NAME}', '{MEETING_NAME}', '{MEETING_RANGE}', '{MEETING_LENGTH}', '{USER_RANGE}', '{SOLUTION}' ),
-				array( $creatorName, $userName, $meetingName, $meetingRange, $meetingLength, $userRange, $solution ),
+				array( '{CREATOR_NAME}', '{USER_NAME}', '{MEETING_NAME}', '{MEETING_RANGE}', '{MEETING_LENGTH}', '{USER_RANGE}', '{SOLUTION}', '{ATTENDEE_NAMES}', '{REPLY}' ),
+				array( $creatorName, $userName, $meetingName, $meetingRange, $meetingLength, $userRange, $solution, $attendeeNames, $reply ),
 				MeetableMessages::$emailMessages[ $messageID ] );
 			
 			echo 'Sending ' . $this->name() . ' an e-mail for ' . $messageID . '<br />';
@@ -328,8 +335,8 @@ AND a1.user = 33
 			$mail->From = $from;
 			$mail->FromName = $meeting->creator()->name();
 			$mail->Subject = str_replace(
-				array( '{CREATOR_NAME}', '{USER_NAME}', '{MEETING_NAME}', '{MEETING_RANGE}', '{MEETING_LENGTH}', '{USER_RANGE}', '{SOLUTION}' ),
-				array( $creatorName, $userName, $meetingName, $meetingRange, $meetingLength, $userRange, $solution ),
+				array( '{CREATOR_NAME}', '{USER_NAME}', '{MEETING_NAME}', '{MEETING_RANGE}', '{MEETING_LENGTH}', '{USER_RANGE}', '{SOLUTION}', '{ATTENDEE_NAMES}', '{REPLY}' ),
+				array( $creatorName, $userName, $meetingName, $meetingRange, $meetingLength, $userRange, $solution, $attendeeNames, $reply ),
 				MeetableMessages::$emailSubjects[ $messageID ] );
 			
 			// text body

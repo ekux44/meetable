@@ -289,7 +289,6 @@ class Meeting
 		
 		// get the current time frame
 		$timeRange = $this->getValidTimeFrame();
-		print_pre($timeRange);
 		
 		// if no time range, we are screwed
 		if( !$timeRange )
@@ -321,9 +320,7 @@ class Meeting
 						'creator' => 0,
 						'active' => 1 ),
 					'single' => true ) ) )
-		{
-			print_pre($timeRange);
-			
+		{	
 			// automatically pick a solution?
 			if( $this->info( 'narrowToOne' ) == 0 )
 			{
@@ -387,10 +384,10 @@ class Meeting
 		*/
 		
 		$exp = explode( ' ', $response );
-		$command = reset( $exp );
+		$command = strtolower( trim( reset( $exp ) ) );
 		unset( $exp[ 0 ] );
 		$body = implode( $exp );
-		
+
 		// command
 		if( $this->isValidCommand( $command, $body, $user ) )
 		{
@@ -703,7 +700,7 @@ class Meeting
 	 */
 	private function isValidCommand( $command, $body, $user )
 	{
-		return in_array( $command, self::$commands );
+		return in_array( strtolower( $command ), self::$commands );
 	}
 	
 	/**
@@ -818,7 +815,61 @@ class Meeting
 	 */
 	private function processCommand( $command, $body, $user, $method )
 	{
-	
+		switch( $command )
+		{
+			// kill the meeting
+			case 'kill':
+				if( $this->creator()->id() == $user->id() )
+				{
+					Database::update(
+						'Meetings',
+						array(
+							'meeting' => $this->id ),
+						array( 'meeting' ) );
+					foreach( $this->attendees() as $a )
+					{
+						if( $a->id() == $user->id() )
+							continue;
+							
+						$a->message( 'cancel', $this );
+					}
+				}
+			break;
+			// lists the available commands
+			case 'man':
+				$user->message( 'man', $this, $method );
+			break;
+			case 'status':
+				$user->message( 'status', $this, $method );
+			break;
+			case 'attendees':
+				$user->message( 'attendees', $this, $method );
+			break;
+			case 'busy':
+				// mark the user as busy
+				if( $this->creator()->id() == $user->id() )
+					return true;
+				
+				Database::update(
+					'Attendees',
+					array(
+						'user' => $user->id(),
+						'meeting' => $this->id,
+						'active' => 0 ),
+					array( 'user', 'meeting' ) );
+			break;
+			case 'reply':
+					global $reply;
+					$reply = $body;
+				foreach( $this->attendees() as $a )
+				{
+					if( $a->id() == $user->id() )
+						continue;
+						
+					$a->message( 'reply', $this );
+				}
+			break;
+		}
 	}
 	
 	/** 
