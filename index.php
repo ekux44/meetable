@@ -170,6 +170,8 @@ case 'testDates':
 	$testCases = array(
 		'4',
 		'3:30',
+		'5:26',
+		'10:30 am',
 		'4pm',
 		'4pm pst',
 		'friday',
@@ -191,6 +193,7 @@ case 'testDates':
 	foreach( $testCases as $time )
 	{
 		echo "Testing case $time " . (($meeting->isValidTime( $time )) ? '<strong>succeeds</strong>' : '<em>fails</em>') . '<br />';
+		echo "Resulting timestamp is " . $meeting->humanReadableRange( $meeting->generateTimeRange( $time ) ) . '<br /><br />';
 	}	
 	
 break;

@@ -12,19 +12,22 @@ class MeetableMessages
 {
 static $smsMessages = array(
 'meeting-kick-off' => '{CREATOR_NAME} wants to schedule {MEETING_NAME} with you. What time or time range can you meet for {MEETING_LENGTH} {MEETING_RANGE}? (HELP for more info)',
-'confirm_time' => 'You have selected the time {USER_RANGE}. To change this please reply with another time or time range',
+'confirm-time' => 'You have selected your availability {USER_RANGE} for {MEETING_NAME}. To change this please reply with another time or time range.',
+'bad-time' => 'The time you sent is not within the available time range {MEETING_RANGE}. Please try again.',
 'bad-input' => 'Sorry, we did not understand your response. Please try again.'
 );
 
 static $emailMessages = array(
 'meeting-kick-off' => '{CREATOR_NAME} wants to schedule {MEETING_NAME} with you. What time or time range can you meet for {MEETING_LENGTH} {MEETING_RANGE}? (HELP for more info)',
-'confirm_time' => 'You have selected the time {USER_RANGE}. To change this please reply with another time or time range',
+'confirm-time' => 'You have selected your availability {USER_RANGE} for {MEETING_NAME}. To change this please reply with another time or time range.',
+'bad-time' => 'The time you sent is not within the available time range {MEETING_RANGE}. Please try again.',
 'bad-input' => 'Sorry, we did not understand your response. Please try again.'
 );
 
 static $emailSubjects = array(
 'meeting-kick-off' => '{CREATOR_NAME} wants to schedule {MEETING_NAME} with you',
-'confirm_time' => 'Confirmation of your time for {MEETING_NAME}',
+'confirm-time' => 'Confirmation of your time for {MEETING_NAME}',
+'bad-time' => 'The time you send is invalid',
 'bad-input' => 'We had trouble understanding your reply.'
 );
 }

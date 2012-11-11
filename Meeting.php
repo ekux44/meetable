@@ -214,19 +214,20 @@ class Meeting
 	
 	function getUserTimeFrame( $user, $humanReadable = false )
 	{
-		// get the time frames of all the users
+		// get the time frames of the users
 		$timeFrame = Database::select(
 			'Time_Frame AS f JOIN Attendees AS a ON a.time_frame = f.id',
 			'f.start,f.end',
 			array(
 				'where' => array(
 					'a.meeting' => $this->id,
-					'a.user' => $user->id() ) ) );
-		
+					'a.user' => $user->id() ),
+				'singleRow' => true ) );
+
 		if( $humanReadable )
-			return $this->humanReadableRange( $timeRange );
+			return $this->humanReadableRange( $timeFrame );
 		else
-			return $timeRange;
+			return $timeFrame;
 	}
 	
 	/**
@@ -249,6 +250,16 @@ class Meeting
 		}
 		else
 			return $length;
+	}
+	
+	/**
+	 * Checks if there is a solution for the problem and returns it
+	 *
+	 *
+	 */
+	function solution()
+	{
+		return array( 'status' => 'solvable' );
 	}
 
 	//////////////////////////////
@@ -298,7 +309,7 @@ class Meeting
 		// time
 		if( $this->isValidTime( $response ) )
 		{
-			$this->registerTime( $body, $user, $method );
+			$this->registerTime( $response, $user, $method );
 		}
 		// error
 		else
@@ -513,7 +524,10 @@ class Meeting
 			9) not within the year, same day
 			10) not within the year, different days 
 		*/
-	
+
+		if( $return[ 'start' ] == $return[ 'end' ] )
+			return 'at ' . date( 'l, F j, Y h:i A', $return[ 'start' ] );
+		
 		// are the dates today?
 		if( $return[ 'end' ] - time() <= 3600*24 && date( 'd', $return[ 'end' ] ) == date( 'd' ) )
 		{
@@ -660,7 +674,7 @@ class Meeting
 		return false;
 	}
 	
-	private function generateTimeRange( $time )
+	function generateTimeRange( $time )
 	{
 		// get our initial parameters
 		$initialTimeFrame = Database::select(
@@ -700,7 +714,7 @@ class Meeting
 			return $strTime;
 		// check for just a number (1<time<12)
 		else if( is_numeric( $time ) && $time > 0 && $time <= 12 )
-			return strtotime( $strTime . ':00' );
+			return strtotime( $time . ':00' );
 		else
 		{
 			$exp = explode( ' ', $time );
@@ -727,36 +741,64 @@ class Meeting
 	 * Registers a time for a given user
 	 *
 	 */
-	private function registerTime( $time, $user , $method)
+	private function registerTime( $time, $user, $method)
 	{
-		// do not register the time if the user is the creator
+		// is the time within our bounds?
+		if( !withinBounds() )
+		{
+			// give the user an error message
+			$user->message( 'bad-time', $this, $method );
+			
+			return true;
+		}
+		
+		// are we talking to the creator?
 		if( $user->id() == $this->creator()->id() )
-			return false;
+		{
+			// has everyone chosen?
+			if( everyoneChosen() )
+			{
+				// set the time range to the creator's choice
+			}
+			else
+				return true;
+		}
+		else
+		{
+			// generate the time range
+			$timeRange = $this->generateTimeRange( $time );
 			
-		// generate the time range
-		$timeRange = $this->getTimeRange( $time );
-		
-		// TODO: this would be more efficient if time ranges were built into the attendee and meeting objects
+			// TODO: this would be more efficient if time ranges were built into the attendee and meeting objects
+				
+			// delete any previous time ranges for the user
+			Database::delete(
+				'Time_Frame',
+				array(
+					'id' => Database::select(
+						'Attendees',
+						'time_frame',
+						array(
+							'where' => array(
+								'user' => $user->id() ),
+							'single' => true ) ) ) );
 			
-		// delete any previous time ranges for the user
-		Database::delete(
-			'Time_Frame',
-			array(
-				'id' => Database::select(
-					'Attendees',
-					'time_frame',
-					array(
-						'where' => array(
-							'user' => $user->id() ),
-						'single' => true ) ) ) );
-		
-		// insert the time range
-		Database::insert(
-			'Time_Frame',
-			array(
-				'start' => $timeRange[ 'start' ],
-				'end' => $timeRange[ 'end' ] ) );
-		
+			// insert the time range
+			Database::insert(
+				'Time_Frame',
+				array(
+					'start' => $timeRange[ 'start' ],
+					'end' => $timeRange[ 'end' ] ) );
+			
+			// update the attendee with the new time range id
+			Database::update(
+				'Attendees',
+				array(
+					'user' => $user->id(),
+					'meeting' => $this->id,
+					'time_frame' => Database::lastInsertId() ),
+				array( 'user', 'meeting' ) );
+		}
+	
 		/*
 			How does this time entry affect the problem? Does it make it:
 			i) solved
@@ -764,6 +806,32 @@ class Meeting
 			iii) unsolvable
 		*/
 		
+		$solution = $this->solution();
+		
+		// solved
+		if( $solution[ 'status' ] == 'solved' )
+		{
+			// confirm the time with everyone
+			
+		}
+		// solvable
+		else if( $solution[ 'status' ] == 'solvable' )
+		{
+			// give everyone a status update with the current time window
+			
+			// if everyone has pitched in, give the organizer the ability to choose within range
+			
+			
+		}
+		// unsolvable
+		else
+		{
+			// shit
+			
+			// ask everyone nicely to re-evaluate their lives
+			
+			// give the creator the opportunity to manually set the time or cancel the meeting
+		}
 		
 		// confirm the time with the user
 		$user->message( 'confirm-time', $this, $method );

@@ -235,7 +235,7 @@ class User
 		$meetingName = $meeting->name();
 		$meetingRange = $meeting->getValidTimeFrame(true);
 		$meetingLength = $meeting->meetingLength( true );
-		$userRange = $user->getUserTimeFrame( $this, true );
+		$userRange = $meeting->getUserTimeFrame( $this, true );
 		
 		if( $phone && in_array( $method, array( 'both', 'phone' ) ) )
 		{
