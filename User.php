@@ -10,11 +10,11 @@ class User
 		'19185746923' );
 	
 	private static $ourEmailAddresses = array(
-		'reply1@meetup.io',
-		'reply2@meetup.io',
-		'reply3@meetup.io',
-		'reply4@meetup.io',
-		'reply5@meetup.io' );
+		'reply1@meetable.io',
+		'reply2@meetable.io',
+		'reply3@meetable.io',
+		'reply4@meetable.io',
+		'reply5@meetable.io' );
 
 	private $id;	
 	private $info;
@@ -152,15 +152,6 @@ class User
 		
 		foreach( $valid as $f )
 		{
-		/*
-		SELECT DISTINCT count(*)
-FROM Attendees AS a1
-WHERE NOT EXISTS (
-    SELECT *
-    FROM Attendees AS a2 JOIN Meetings as m ON a2.meeting = m.id JOIN Time_Frame as t ON m.time_frame = t.id
-    WHERE ( m.status <> 0 OR t.end > '1352639931' ) AND ( active = 1 AND a2.user = a1.user AND a1.smsFrom = '19183763309' ) )
-AND a1.user = 33
-*/
 			// check that the address is not in use by the attendee with:
 			// i) unsolved meeting
 			// ii) unexpired meeting
@@ -255,7 +246,7 @@ AND a1.user = 33
 		foreach( $attendees as $a )
 			$attNames[] = $a->name();
 		
-		$attendeeNames = implode( ',', $attNames );
+		$attendeeNames = implode( ', ', $attNames );
 		
 		if( $phone && in_array( $method, array( 'both', 'phone' ) ) )
 		{

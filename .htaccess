@@ -15,6 +15,9 @@ RewriteRule ^js/(.*)$ js/$1 [L]
 RewriteRule ^css/(.*)$ css/$1 [L]
 RewriteRule ^img/(.*)$ img/$1 [L]
 
+# show landing page for root
+RewriteRule ^(.*)$ landing_page.php [QSA,L]
+
 RewriteRule ^index\.php$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

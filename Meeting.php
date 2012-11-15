@@ -198,7 +198,7 @@ class Meeting
 		// get the time frames of all the users
 		$timeFrames = Database::select(
 			'Time_Frame AS f JOIN Attendees AS a ON a.time_frame = f.id',
-			'f.start,f.end',
+			'f.start AS start,f.end AS end',
 			array(
 				'where' => array(
 					'a.meeting' => $this->id,
@@ -394,7 +394,7 @@ class Meeting
 			$this->processCommand( $command, $body, $user, $method );
 		}
 		// time
-		if( $this->isValidTime( $response ) )
+		elseif( $this->isValidTime( $response ) )
 		{
 			$this->registerTime( $response, $user, $method );
 		}
