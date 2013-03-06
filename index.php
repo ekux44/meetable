@@ -186,7 +186,6 @@ case 'testDates':
 		'november 9, 2014 5pm',
 		'november 9, 2014 6pm pst',
 		'4pm to 5pm',
-		'penis',
 		'blah',
 		'is this a time?'
 	);
